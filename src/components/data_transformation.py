@@ -1,7 +1,7 @@
 import sys
 import os
 
-from exception import customException
+from src.exception import customException
 from utils import save_object
 
 from logger import logging

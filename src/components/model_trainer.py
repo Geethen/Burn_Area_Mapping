@@ -13,7 +13,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 from utils import save_object, evaluate_models
 from logger import logging
-from exception import CustomException
+from src.exception import CustomException
 
 @dataclass
 class modelTrainerConfig:

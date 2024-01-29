@@ -1,0 +1,10 @@
+[ 2024-01-27 13:41:26,846 ] 122 root - INFO - Preparing y image collection (confidence masking, projection, add date Band)
+[ 2024-01-27 13:41:27,329 ] 133 root - INFO - Prepared 29 y images
+[ 2024-01-27 13:41:29,007 ] 107 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-01-27 13:45:37,872 ] 122 root - INFO - Preparing y image collection (confidence masking, projection, add date Band)
+[ 2024-01-27 13:45:39,962 ] 133 root - INFO - Prepared 29 y images
+[ 2024-01-27 13:45:42,217 ] 107 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-01-27 14:13:36,142 ] 120 root - INFO - Preparing y image collection (confidence masking, projection, add date Band)
+[ 2024-01-27 14:13:36,759 ] 131 root - INFO - Prepared 29 y images
+[ 2024-01-27 14:13:38,381 ] 105 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-01-27 14:18:38,304 ] 109 root - INFO - Prepared 85791 X images

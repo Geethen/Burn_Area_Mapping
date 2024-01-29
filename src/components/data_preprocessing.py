@@ -1,7 +1,5 @@
-import os 
-import sys
 import ee
-import math
+import sys
 
 try:
     ee.Initialize()
@@ -9,15 +7,15 @@ except:
     ee.Authenticate()
 
 from src.logger import logging
-# from src.exception import customException
+from exception import customException
 
-def cloudMask(sensor: str, image : ee.Image )-> ee.Image:
+def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
     """
     This function performs scaling to reflectance and cloud masking on Landsat 4, 5, 7, 8 and 9 and Sentinel-2.
     Landsat uses the QA bands and Sentinel-2 uses the CloudScore+ dataset.
 
     Args:
-        Landsat (str): Specifies a Lansat mission. Either 'L8' and 'L9'.
+        sensor (str): Specifies a Lansat mission. Either 'L8' and 'L9'.
         image (ee.Image): A landat image collection
 
     Returns:
@@ -68,7 +66,7 @@ def cloudMask(sensor: str, image : ee.Image )-> ee.Image:
         # Replace the original bands with the scaled ones and apply the masks.
         return image.addBands(opticalBands, None, True)\
             .addBands(thermalBand, None, True)\
-            .updateMask(qaMask)
+            .updateMask(qaMask)\
             .updateMask(saturationMask)
             # .updateMask(clouds)\
             # .updateMask(cirrus)\
@@ -135,7 +133,7 @@ def preProcessyCollection(collection, region, startDate, endDate):
     return fire
 
 if __name__ == '__main__':
-    # try:
+    try:
         # Filter countries by geometry
         countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
         geometry = ee.Geometry.Point([24.06353794842853, -29.732969740562062])
@@ -147,6 +145,6 @@ if __name__ == '__main__':
 
         y = preProcessyCollection(collection = ee.ImageCollection("ESA/CCI/FireCCI/5_1"), region = sa_geo, startDate = startDate, endDate = endDate)
         X = preProcessXCollection(collection = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED"), region = sa_geo, startDate = startDate, endDate = endDate)
-    # except Exception as e:
-    #     customException(e, sys)
+    except Exception as e:
+        customException(e, sys)
 
