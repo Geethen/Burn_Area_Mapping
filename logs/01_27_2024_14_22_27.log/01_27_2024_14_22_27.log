@@ -1,4 +1,0 @@
-[ 2024-01-27 14:22:27,014 ] 120 root - INFO - Preparing y image collection (confidence masking, projection, add date Band)
-[ 2024-01-27 14:22:27,542 ] 131 root - INFO - Prepared 4 y images
-[ 2024-01-27 14:22:27,869 ] 105 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
-[ 2024-01-27 14:22:29,017 ] 109 root - INFO - Prepared 0 X images

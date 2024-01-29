@@ -7,7 +7,7 @@ except:
     ee.Authenticate()
 
 from src.logger import logging
-from exception import customException
+from src.exception import customException
 
 def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
     """
@@ -92,7 +92,7 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
 
 
 # Prepare Sentinel or Landsat
-def preProcessXCollection(collection, region, startDate, endDate):
+def preProcessXCollection(collection: ee.ImageCollection, region: ee.Geometry, startDate : str, endDate: str)-> ee.ImageCollection:
     """
     This function performs spatio-temporal filtering, cloud masking, and then creates a gap-filled composite
     for Landsat and Sentinel-2.
@@ -110,14 +110,14 @@ def preProcessXCollection(collection, region, startDate, endDate):
     logging.info(f"Prepared {filteredCollection.size().getInfo()} X images")
     return filteredCollection
 
-def confidenceMask(image):
+def confidenceMask(image: ee.Image)-> ee.Image:
     # Define a function to remove fires with confidence level < 50%
     conf = image.select('ConfidenceLevel')
     level = conf.gt(50)
     yearBand = ee.Image(ee.Image(image).date().get('year')).toInt().rename('BurnYear')
     return image.updateMask(level).select('BurnDate').addBands(yearBand)
 
-def preProcessyCollection(collection, region, startDate, endDate):
+def preProcessyCollection(collection: ee.ImageCollection, region: ee.Geometry, startDate: str, endDate: str):
     logging.info("Preparing y image collection (confidence masking, projection, add date Band)")
     # Filter and map the fire collection
     fire = collection \
@@ -131,20 +131,4 @@ def preProcessyCollection(collection, region, startDate, endDate):
     fire = fire.map(lambda image: image.setDefaultProjection(**{'crs':projection, 'scale': 250}))
     logging.info(f"Prepared {fire.size().getInfo()} y images")
     return fire
-
-if __name__ == '__main__':
-    try:
-        # Filter countries by geometry
-        countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
-        geometry = ee.Geometry.Point([24.06353794842853, -29.732969740562062])
-        sa = countries.filterBounds(geometry)
-        sa_geo = sa.geometry()
-        # Define start and end dates
-        startDate = ee.Date.fromYMD(2018, 7, 4)
-        endDate = ee.Date.fromYMD(2018, 11, 15)
-
-        y = preProcessyCollection(collection = ee.ImageCollection("ESA/CCI/FireCCI/5_1"), region = sa_geo, startDate = startDate, endDate = endDate)
-        X = preProcessXCollection(collection = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED"), region = sa_geo, startDate = startDate, endDate = endDate)
-    except Exception as e:
-        customException(e, sys)
 
