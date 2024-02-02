@@ -1,6 +1,6 @@
 import sys
 import os
-from src.exception import customException
+from src.components.exception import customException
 from logger import logging
 from components.data_transformation import DataTransformation
 from components.model_trainer import ModelTrainer

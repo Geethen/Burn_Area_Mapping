@@ -7,7 +7,7 @@ except:
     ee.Authenticate()
 
 from src.logger import logging
-from src.exception import customException
+from exception import customException
 
 def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
     """

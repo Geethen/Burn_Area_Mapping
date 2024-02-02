@@ -7,7 +7,7 @@ import dill
 from sklearn.metrics import r2_score
 from sklearn.model_selection import (train_test_split, GridSearchCV)
 
-from src.exception import CustomException
+from exception import customException
 
 def save_object(file_path, obj):
     try:
@@ -44,6 +44,3 @@ def evaluate_models(X, y, models, param):
     
     except Exception as e:
             raise CustomException(e, sys)
-
-
-
