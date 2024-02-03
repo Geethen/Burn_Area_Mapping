@@ -1,5 +1,6 @@
 import ee
 import sys
+import math
 
 try:
     ee.Initialize()
@@ -15,7 +16,7 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
     Landsat uses the QA bands and Sentinel-2 uses the CloudScore+ dataset.
 
     Args:
-        sensor (str): Specifies a Lansat mission. Either 'L8' and 'L9'.
+        sensor (str): Specifies a Lansat mission. One of [].
         image (ee.Image): A landat image collection
 
     Returns:
@@ -30,22 +31,23 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
         #   Bit 2 - Cirrus
         #   Bit 3 - Cloud
         #   Bit 4 - Cloud Shadow
-        # clouds = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 10)).eq(0)
-        # cirrus = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 11)).eq(0)
-        qaMask = image.select('QA_PIXEL').bitwiseAnd(parseInt('11111', 2)).eq(0)
+        clouds = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 10)).eq(0)
+        cirrus = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 11)).eq(0)
         saturationMask = image.select('QA_RADSAT').eq(0)
 
         #   Apply the scaling factors to the appropriate bands.
         opticalBands = image.select('SR_B.').multiply(0.0000275).add(-0.2)
         thermalBands = image.select('ST_B.*').multiply(0.00341802).add(149.0)
 
+        # Compute normalised burn ratio (NBR)
+        nbr = image.normalizedDifference(['SR_B5', 'SR_B7']).multiply(-1).rename('nbr')
+
         #  Replace the original bands with the scaled ones and apply the masks.
-        return image.addBands(opticalBands, None, True)\
-            .addBands(thermalBands, None, True)\
-            .updateMask(qaMask)\
+        return image.addBands([opticalBands, thermalBands, nbr], None, True)\
+            .updateMask(clouds)\
+            .updateMask(cirrus)\
             .updateMask(saturationMask)
-            # .updateMask(clouds)\
-            # .updateMask(cirrus)\
+            
             
     # Landsat 4,5,7 surface reflectance
     if sensor in ['LANDSAT_4', 'LANDSAT_5', 'LANDSAT_7']:
@@ -54,22 +56,23 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
         # Bit 2 - Unused
         # Bit 3 - Cloud
         # Bit 4 - Cloud Shadow
-        # clouds = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 10)).eq(0)
-        # cirrus = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 11)).eq(0)
-        qaMask = image.select('QA_PIXEL').bitwiseAnd(parseInt('11111', 2)).eq(0)
+        clouds = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 10)).eq(0)
+        cirrus = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 11)).eq(0)
         saturationMask = image.select('QA_RADSAT').eq(0)
 
         # Apply the scaling factors to the appropriate bands.
         opticalBands = image.select('SR_B.').multiply(0.0000275).add(-0.2)
         thermalBand = image.select('ST_B6').multiply(0.00341802).add(149.0)
 
+        # Compute normalised burn ratio (NBR)
+        nbr = image.normalizedDifference(['SR_B4', 'SR_B7']).multiply(-1).rename('nbr')
+
         # Replace the original bands with the scaled ones and apply the masks.
         return image.addBands(opticalBands, None, True)\
             .addBands(thermalBand, None, True)\
-            .updateMask(qaMask)\
+            .updateMask(clouds)\
+            .updateMask(cirrus)\
             .updateMask(saturationMask)
-            # .updateMask(clouds)\
-            # .updateMask(cirrus)\
             
     
     # Sentinel-2
@@ -87,8 +90,12 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
 
         # link Sentinel-2 image with corresponding Cloud Score+
         cloudMask = image.linkCollection(csPlus, [QA_BAND]).select(QA_BAND).gte(CLEAR_THRESHOLD)
+
+        # Compute normalised burn ratio (NBR)
+        nbr = image.normalizedDifference(['B12', 'B8']).rename('nbr')
+
         # scale and mask out clouds
-        return image.divide(10000).updateMask(cloudMask)
+        return image.divide(10000).addBands(nbr).updateMask(cloudMask)
 
 
 # Prepare Sentinel or Landsat
@@ -114,8 +121,8 @@ def confidenceMask(image: ee.Image)-> ee.Image:
     # Define a function to remove fires with confidence level < 50%
     conf = image.select('ConfidenceLevel')
     level = conf.gt(50)
-    yearBand = ee.Image(ee.Image(image).date().get('year')).toInt().rename('BurnYear')
-    return image.updateMask(level).select('BurnDate').addBands(yearBand)
+    # yearBand = ee.Image(ee.Image(image).date().get('year')).toInt().rename('BurnYear')
+    return image.set('BurnYear', ee.Image(image).date().get('year').toInt()).updateMask(level).select('BurnDate')#.addBands(yearBand)
 
 def preProcessyCollection(collection: ee.ImageCollection, region: ee.Geometry, startDate: str, endDate: str):
     logging.info("Preparing y image collection (confidence masking, projection, add date Band)")

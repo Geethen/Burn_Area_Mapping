@@ -1,5 +1,11 @@
 import sys
 import os
+import ee
+try:
+    ee.Initialize()
+except:
+    ee.Authenticate()
+    ee.Initialize()
 
 from src.components.exception import customException
 from utils import save_object
@@ -14,25 +20,28 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-# add two columns
-# df = pd.read_csv(r'C:/Users/coach/Documents/scratch/Post_doc/Fire/data/fire_2019_08_01.csv')
-# df = df.dropna()
-# risk_dict = {7692: 'Extreme', 7805:'High', 2903:'Medium', 6555:'Low'}
-# df['risk'] = df['fireRisk'].astype(int).map(risk_dict)
-
-# # Combine 'year' and 'day_of_year' columns to create a new datetime column
-# df['date'] = pd.to_datetime(df['BurnYear'].astype(str) + df['BurnDate'].astype(str), format='%Y%j')
 
 # Create fire events
 
-# Compute NBR
-# Define a function to compute NBR
-def compute_nbr(img):
-    nbr = img.normalizedDifference(['B8', 'B12']).multiply(-1).rename('nbr')
-    return nbr.set('system:time_start', img.get('system:time_start'))
+class DataTransformation:
+    def __init__(self, collection) -> None:
+        self.collection = collection
 
-# Map the NBR computation function over the collection
-nbr_collection = collection.map(compute_nbr)
+    # def initiate_Xdata_transformation(self, X_data_path):
+
+    def initiate_ydata_transformation(self, fire_data_path):
+        try:
+            df = pd.read_csv(fire_data_path)
+            df = df.dropna()
+            # Add a column for fire risk
+            risk_dict = {7692: 'Extreme', 7805:'High', 2903:'Medium', 6555:'Low'}
+            df['risk'] = df['fireRisk'].astype(int).map(risk_dict)
+
+            # Combine 'year' and 'day_of_year' columns to create a new datetime column
+            df['date'] = pd.to_datetime(df['BurnYear'].astype(str) + df['BurnDate'].astype(str), format='%Y%j')
+        
+        except Exception as e:
+            raise customException(e, sys)
 
 
 
