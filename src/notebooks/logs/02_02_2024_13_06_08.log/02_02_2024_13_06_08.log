@@ -1,0 +1,7 @@
+[ 2024-02-02 13:12:50,625 ] 128 root - INFO - Preparing y image collection (confidence masking, projection, add date Band)
+[ 2024-02-02 13:12:51,205 ] 139 root - INFO - Prepared 13 y images
+[ 2024-02-02 13:12:51,524 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-02 13:13:32,290 ] 117 root - INFO - Prepared 15661 X images
+[ 2024-02-02 13:13:32,290 ] 30 root - INFO - Extracting fire data...
+[ 2024-02-02 13:15:57,225 ] 163 googleapiclient.http - WARNING - Sleeping 0.00 seconds before retry 1 of 5 for request: POST https://earthengine.googleapis.com/v1/projects/earthengine-legacy/value:compute?prettyPrint=false&alt=json, after 503
+[ 2024-02-02 13:35:09,915 ] 341 geeml.extract - INFO - Cancelling...

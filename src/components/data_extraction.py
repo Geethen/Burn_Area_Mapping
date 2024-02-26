@@ -7,6 +7,48 @@ except:
 
 from src.logger import logging
 from geeml.extract import extractor
+from src.data_extraction import preProcessXCollection
+
+def extractXy (Xcollection: ee.ImageCollection, yCollection: ee.FeatureCollection, Xweeks: int):
+    """Extracts x and y data from the given collections"""
+    logging.info("Extracting x and y data")
+
+    ySize = yCollection.size().getInfo()
+    fire = yCollection.toList(ySize)
+    for idx in range(ySize):
+        fireEvent = ee.Feature(fire.get(idx))
+        startDate = fireEvent.get('BurnDate').first().getInfo()
+        endDate = fireEvent.get('BurnDate').last().getInfo()
+
+        # Define datasets
+        L8filtered =  preProcessXCollection(collection = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2'), region = fireEvent, startDate = startDate, endDate = endDate)
+        # L9filtered = preProcessXCollection(collection = ee.ImageCollection('LANDSAT/LC09/C02/T1_L2'), region = fireEvent, startDate = startDate, endDate = endDate)
+        # S2filtered = preProcessXCollection(collection = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2'), region = fireEvent, startDate = startDate, endDate = endDate)
+
+        # Compute NBR temporal percentiles
+        reducer = ee.Reducer.percentile([5, 25, 50, 75, 95])
+        L8percentiles = L8filtered.reduce(reducer)
+        # S2percentiles = S2filtered.reduce(reducer)
+        # Compute temporal variance
+        L8variance = L8percentiles.reduce(ee.Reducer.variance()).rename('temporal_variance')
+        # S2variance = S2percentiles.reduce(ee.Reducer.variance())
+
+        # Compute image spatial stats
+        L8stats = L8variance.reduceRegion(reducer = reducer,
+                                              geometry = L8variance.geometry(),
+                                              scale = 1000).get('temporal_variance')
+        # S2stats = S2variance.reduceRegion(reducer = reducer,
+        #                                       geometry = S2variance.geometry(),
+        #                                       scale = 1000)
+        # convert to geodataframe
+        ee.data.computeFeatures(L8stats, L8stats.geometry())
+
+        # Properties to extract
+        # Area
+        # startdate
+        # enddate
+        # duration
+        
 
 def extractFire(collection: ee.ImageCollection, region: ee.Feature, scale:int) -> None:
     """For each pixel in the fire image collection (burn areas) extract coordinates,

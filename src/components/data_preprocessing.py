@@ -125,7 +125,7 @@ def confidenceMask(image: ee.Image)-> ee.Image:
     return image.set('BurnYear', ee.Image(image).date().get('year').toInt()).updateMask(level).select('BurnDate')#.addBands(yearBand)
 
 def preProcessyCollection(collection: ee.ImageCollection, region: ee.Geometry, startDate: str, endDate: str):
-    logging.info("Preparing y image collection (confidence masking, projection, add date Band)")
+    logging.info("Preparing y image collection (confidence masking, projection, select date Band)")
     # Filter and map the fire collection
     fire = collection \
         .filterBounds(region) \
