@@ -31,8 +31,8 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
         #   Bit 2 - Cirrus
         #   Bit 3 - Cloud
         #   Bit 4 - Cloud Shadow
-        clouds = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 10)).eq(0)
-        cirrus = image.select('QA_PIXEL').bitwiseAnd(math.pow(2, 11)).eq(0)
+        clouds = image.select('QA_PIXEL').bitwiseAnd(0b1000).eq(0)
+        cirrus = image.select('QA_PIXEL').bitwiseAnd(0b1100).eq(0)
         saturationMask = image.select('QA_RADSAT').eq(0)
 
         #   Apply the scaling factors to the appropriate bands.

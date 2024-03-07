@@ -1,0 +1,122 @@
+[ 2024-02-26 14:13:16,257 ] 16 root - INFO - Extracting x and y data
+[ 2024-02-26 14:13:34,905 ] 16 root - INFO - Extracting x and y data
+[ 2024-02-26 14:14:16,652 ] 16 root - INFO - Extracting x and y data
+[ 2024-02-26 14:14:18,562 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:15:10,285 ] 16 root - INFO - Extracting x and y data
+[ 2024-02-26 14:15:11,986 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:15:12,855 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:15:14,363 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:15:16,112 ] 117 root - INFO - Prepared 6 X images
+[ 2024-02-26 14:15:17,439 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:15:19,582 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:15:21,033 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:15:22,867 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:15:24,511 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:15:25,470 ] 117 root - INFO - Prepared 8 X images
+[ 2024-02-26 14:16:12,968 ] 16 root - INFO - Extracting x and y data
+[ 2024-02-26 14:16:13,809 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:16:15,594 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:16:17,159 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:16:18,609 ] 117 root - INFO - Prepared 6 X images
+[ 2024-02-26 14:16:19,778 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:16:21,678 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:16:22,994 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:16:24,703 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:16:26,131 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:16:27,302 ] 117 root - INFO - Prepared 8 X images
+[ 2024-02-26 14:18:11,952 ] 17 root - INFO - Extracting x and y data
+[ 2024-02-26 14:18:13,591 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:18:14,516 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:26:15,186 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 14:26:16,821 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:26:18,458 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:27:53,367 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 14:27:54,961 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:27:56,022 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:41:08,080 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 14:41:10,767 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:41:11,642 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:41:13,256 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:41:15,041 ] 117 root - INFO - Prepared 6 X images
+[ 2024-02-26 14:41:16,736 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:41:18,413 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:41:20,145 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:41:21,211 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:41:22,945 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:41:24,583 ] 117 root - INFO - Prepared 8 X images
+[ 2024-02-26 14:43:38,937 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 14:43:40,581 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:43:41,781 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:43:43,231 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:43:45,006 ] 117 root - INFO - Prepared 6 X images
+[ 2024-02-26 14:43:46,670 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:43:47,766 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:43:48,911 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:43:49,972 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:43:51,532 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:43:53,171 ] 117 root - INFO - Prepared 8 X images
+[ 2024-02-26 14:58:28,056 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 14:58:28,831 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:58:31,001 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:58:32,612 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:58:33,789 ] 117 root - INFO - Prepared 6 X images
+[ 2024-02-26 14:58:35,340 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:58:36,045 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:59:13,051 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 14:59:14,008 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:59:15,333 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 14:59:16,937 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:59:18,036 ] 117 root - INFO - Prepared 6 X images
+[ 2024-02-26 14:59:19,415 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 14:59:20,223 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:00:43,996 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 15:00:45,624 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:00:46,618 ] 117 root - INFO - Prepared 4 X images
+[ 2024-02-26 15:01:31,647 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 15:01:32,554 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:01:33,628 ] 117 root - INFO - Prepared 4 X images
+[ 2024-02-26 15:01:35,870 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:01:37,921 ] 117 root - INFO - Prepared 4 X images
+[ 2024-02-26 15:01:40,074 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:01:41,732 ] 117 root - INFO - Prepared 4 X images
+[ 2024-02-26 15:04:30,152 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 15:04:31,841 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:04:32,853 ] 117 root - INFO - Prepared 4 X images
+[ 2024-02-26 15:05:10,699 ] 18 root - INFO - Extracting x and y data
+[ 2024-02-26 15:05:12,331 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:05:13,354 ] 117 root - INFO - Prepared 4 X images
+[ 2024-02-26 15:05:16,287 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:05:17,887 ] 117 root - INFO - Prepared 4 X images
+[ 2024-02-26 15:05:20,495 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:05:22,103 ] 117 root - INFO - Prepared 4 X images
+[ 2024-02-26 15:15:33,948 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:15:47,430 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:15:48,274 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:17:41,938 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:17:43,549 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:18:25,509 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:18:26,138 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:18:55,717 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:18:56,471 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:19:08,231 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:19:09,799 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:20:08,484 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:20:09,237 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:20:22,892 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:20:24,559 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:21:12,608 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:21:13,286 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:26:12,153 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:26:14,030 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:27:03,256 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:27:03,958 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:27:11,564 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:27:13,377 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:28:25,964 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:28:26,733 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:29:08,887 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:29:09,657 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:31:35,405 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:31:37,008 ] 117 root - INFO - Prepared 7 X images
+[ 2024-02-26 15:31:54,499 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-02-26 15:31:55,208 ] 117 root - INFO - Prepared 7 X images

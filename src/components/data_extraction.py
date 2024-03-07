@@ -1,47 +1,154 @@
+import pandas as pd
 import ee
+import sys
 try:
     ee.Initialize()
 except:
     ee.Authenticate()
     ee.Initialize()
+from tqdm.auto import tqdm
+from geeml.utils import eeprint
 
 from src.logger import logging
+from exception import customException
 from geeml.extract import extractor
-from src.data_extraction import preProcessXCollection
+from data_preprocessing import preProcessXCollection
 
-def extractXy (Xcollection: ee.ImageCollection, yCollection: ee.FeatureCollection, Xweeks: int):
+supportedSensors = {'Sentinel-2': ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED"),
+                    'LANDSAT_4': ee.ImageCollection("LANDSAT/LT04/C02/T1_L2"),
+                    'LANDSAT_5': ee.ImageCollection("LANDSAT/LT05/C02/T1_L2"),
+                    'LANDSAT_7': ee.ImageCollection("LANDSAT/LE07/C02/T1_L2"),
+                    'LANDSAT_8': ee.ImageCollection("LANDSAT/LC08/C02/T1_L2"),
+                    'LANDSAT_9': ee.ImageCollection("LANDSAT/LC09/C02/T1_L2")}
+
+def getStats(imageCollection: ee.ImageCollection)->pd.DataFrame:
+    """
+    computes the (spatial) percentiles (5, 25, 50, 75, 95) for the temporal variance across the temporal percentiles
+
+    Args:
+        imageCollection (ee.ImageCollection): A imagecollection that contains a Normalised Burn-Ratio band called 'nbr'
+
+    Returns:
+        pd.DataFrame containing the 5 percentiles and a column ('scenes') containing a list of scene id's used for the computation
+    """
+    scenes = [imageCollection.aggregate_array('system:index').getInfo()]
+    # Compute NBR temporal percentiles
+    reducer = ee.Reducer.percentile([5, 25, 50, 75, 95])
+    percentiles = imageCollection.select('nbr').reduce(reducer)
+    # Compute temporal variance
+    variance = percentiles.reduce(ee.Reducer.variance()).rename('temporal_variance')
+    # Compute image spatial stats
+    stats = variance.reduceRegion(reducer = reducer,
+                                            geometry = imageCollection.geometry(),
+                                            scale = 1000)
+    row = pd.DataFrame([stats.getInfo()])
+    row['scenes'] = scenes
+    return row
+
+def getImages(image: ee.Image, featureCollection: ee.FeatureCollection, Xweeks: int)-> ee.ImageCollection:
+    """ 
+    1) Checks if image is spatio-temporally within a fire event, labels image accordingly and
+    2) Gets all prior images associated with creating a feature.
+    """
+    # get all firevents that overlap the scene and that started at most two months prior to currentn image 
+    # We use 2 months prior -nMonths largely irrelevant because we check if image falls with a dateRange.
+    # Only consideration is for compute
+    fireEvents = featureCollection.filterBounds(image.geometry()).filterDate(image.date().advance(-2, 'month'), image.date().advance(1, 'day'))
+    startDate = fireEvents.aggregate_min('system:time_start')
+    endDate = fireEvents.aggregate_max('system:time_end')
+    # If there are no fire events from two months prior to image, start and end date will be assigned None, overwrite this with
+    # current image date. This will return False for the dateRange function.
+    if startDate.getInfo() is None or endDate.getInfo() is None:
+        startDate = image.date()
+        endDate = image.date()
+
+    dateRange = ee.DateRange(startDate, endDate)
+
+    # check if it falls within dateRange of a fire event- set label property
+    yImage = ee.Algorithms.If(dateRange.contains(image.date()), image.set('label', 1).copyProperties(image), image.set('label', 0).copyProperties(image))
+
+    # Get satellite name
+    sensor = image.get('SPACECRAFT_ID').getInfo()
+    if sensor is None:
+        sensor = 'Sentinel-2'
+
+    endDate = image.date()
+    startDate = endDate.advance(ee.Number(Xweeks*-7),'day')
+    # Define datasets, get xweeks nImages prior to image (i.e., get time series info)
+    xImages =  preProcessXCollection(collection = supportedSensors.get(sensor),
+                                     region = image.geometry(), startDate = startDate,
+                                       endDate = endDate)
+    return xImages, yImage
+
+def extractDataset(sensor, country, startDate, endDate, fireEvents, Xweeks: int, filename)-> pd.DataFrame:
+    """Extracts the dataset from the given image collection
+    
+    Args:
+        sensor (str): 
+        country (ee.Geometry): 
+        startDate (ee.date): 
+        endDate (ee.Date): 
+
+    Returns:
+        pd.DataFrame
+    
+    """
+    logging.info("Extracting x and y data (extractDataset)")
+    countryGeom = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017").filter(ee.Filter.eq('country_na', country)).geometry()
+    # filterImages to country of interest
+    filteredImages = supportedSensors.get(sensor).filterBounds(countryGeom).filterDate(startDate, endDate)
+    
+    xSize = filteredImages.size().getInfo()
+    xListImages = filteredImages.toList(xSize)
+
+    outdf = pd.DataFrame()
+    for idx in tqdm(range(xSize)):
+        xImage = ee.Image(xListImages.get(idx))
+        # get Ximages and labelled y image
+        xImages, yImage = getImages(xImage, fireEvents, Xweeks)
+        eeprint(yImage)
+        # convert to geodataframe
+        try:
+            row = getStats(xImages)
+            row['label'] = ee.Image(yImage).get('label').getInfo()
+            outdf = pd.concat([outdf, row])
+            # Write the results to a file.
+            with open(filename, 'w', newline='') as file:
+                # Use the to_csv method to write the DataFrame to the CSV file
+                outdf.to_csv(file, index=False)
+        except Exception as e:
+            raise customException(e, sys)
+
+def extractXy (yCollection: ee.FeatureCollection, Xweeks: int, filename):
     """Extracts x and y data from the given collections"""
     logging.info("Extracting x and y data")
 
     ySize = yCollection.size().getInfo()
     fire = yCollection.toList(ySize)
-    for idx in range(ySize):
+
+    outdf = pd.DataFrame()
+    for idx in tqdm(range(ySize)):
         fireEvent = ee.Feature(fire.get(idx))
-        startDate = fireEvent.get('BurnDate').first().getInfo()
-        endDate = fireEvent.get('BurnDate').last().getInfo()
+        endDate = ee.Date(fireEvent.get('ig_date'))
+        startDate = endDate.advance(ee.Number(Xweeks*-7),'day')
 
         # Define datasets
-        L8filtered =  preProcessXCollection(collection = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2'), region = fireEvent, startDate = startDate, endDate = endDate)
+        L8filtered =  preProcessXCollection(collection = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2'), region = fireEvent.geometry(), startDate = startDate, endDate = endDate)
         # L9filtered = preProcessXCollection(collection = ee.ImageCollection('LANDSAT/LC09/C02/T1_L2'), region = fireEvent, startDate = startDate, endDate = endDate)
         # S2filtered = preProcessXCollection(collection = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2'), region = fireEvent, startDate = startDate, endDate = endDate)
-
-        # Compute NBR temporal percentiles
-        reducer = ee.Reducer.percentile([5, 25, 50, 75, 95])
-        L8percentiles = L8filtered.reduce(reducer)
-        # S2percentiles = S2filtered.reduce(reducer)
-        # Compute temporal variance
-        L8variance = L8percentiles.reduce(ee.Reducer.variance()).rename('temporal_variance')
-        # S2variance = S2percentiles.reduce(ee.Reducer.variance())
-
-        # Compute image spatial stats
-        L8stats = L8variance.reduceRegion(reducer = reducer,
-                                              geometry = L8variance.geometry(),
-                                              scale = 1000).get('temporal_variance')
-        # S2stats = S2variance.reduceRegion(reducer = reducer,
-        #                                       geometry = S2variance.geometry(),
-        #                                       scale = 1000)
+        
         # convert to geodataframe
-        ee.data.computeFeatures(L8stats, L8stats.geometry())
+        try:
+            row = getStats(L8filtered)
+            outdf = pd.concat([outdf, row])
+            # Write the results to a file.
+            with open(filename, 'w', newline='') as file:
+                # Use the to_csv method to write the DataFrame to the CSV file
+                outdf.to_csv(file, index=False)
+        except Exception as e:
+            raise customException(e, sys)
+            # print(f"Error occurred for index {idx}")
+            # continue
 
         # Properties to extract
         # Area
