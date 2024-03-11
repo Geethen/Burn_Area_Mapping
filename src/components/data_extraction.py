@@ -72,12 +72,8 @@ def getImages(image: ee.Image, featureCollection: ee.FeatureCollection, Xweeks: 
     if sensor is None:
         sensor = 'Sentinel-2'
 
-    endDate = image.date()
-    startDate = endDate.advance(ee.Number(Xweeks*-7),'day')
     # Define datasets, get xweeks nImages prior to image (i.e., get time series info)
-    xImages =  preProcessXCollection(collection = supportedSensors.get(sensor),
-                                     region = image.geometry(), startDate = startDate,
-                                       endDate = endDate)
+    xImages =  preProcessXCollection(image = image, nImages = 4, returnInterval = 16)
     return xImages, yImage
 
 def extractDataset(sensor, country, startDate, endDate, fireEvents, Xweeks: int, filename)-> pd.DataFrame:
@@ -106,7 +102,6 @@ def extractDataset(sensor, country, startDate, endDate, fireEvents, Xweeks: int,
         xImage = ee.Image(xListImages.get(idx))
         # get Ximages and labelled y image
         xImages, yImage = getImages(xImage, fireEvents, Xweeks)
-        eeprint(yImage)
         # convert to geodataframe
         try:
             row = getStats(xImages)

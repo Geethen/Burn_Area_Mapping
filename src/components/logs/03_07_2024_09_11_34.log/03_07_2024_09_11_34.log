@@ -16,3 +16,14 @@
 [ 2024-03-07 09:43:42,017 ] 96 root - INFO - Extracting x and y data (extractDataset)
 [ 2024-03-07 09:44:01,840 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
 [ 2024-03-07 09:44:13,383 ] 117 root - INFO - Prepared 6 X images
+[ 2024-03-07 09:46:08,747 ] 98 root - INFO - Extracting x and y data (extractDataset)
+[ 2024-03-07 09:46:42,615 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-03-07 09:46:51,362 ] 117 root - INFO - Prepared 6 X images
+[ 2024-03-07 09:48:41,779 ] 98 root - INFO - Extracting x and y data (extractDataset)
+[ 2024-03-07 09:49:15,606 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-03-07 09:49:24,334 ] 117 root - INFO - Prepared 6 X images
+[ 2024-03-07 09:55:21,791 ] 96 root - INFO - Extracting x and y data (extractDataset)
+[ 2024-03-07 09:55:53,941 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-03-07 09:56:04,101 ] 117 root - INFO - Prepared 6 X images
+[ 2024-03-07 09:56:58,790 ] 113 root - INFO - Preparing X image collection (filtering, scaling, cloud masking)
+[ 2024-03-07 09:57:07,022 ] 117 root - INFO - Prepared 6 X images

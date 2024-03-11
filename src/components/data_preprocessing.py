@@ -10,6 +10,13 @@ except:
 from src.logger import logging
 from exception import customException
 
+supportedSensors = {'Sentinel-2': ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED"),
+                    'LANDSAT_4': ee.ImageCollection("LANDSAT/LT04/C02/T1_L2"),
+                    'LANDSAT_5': ee.ImageCollection("LANDSAT/LT05/C02/T1_L2"),
+                    'LANDSAT_7': ee.ImageCollection("LANDSAT/LE07/C02/T1_L2"),
+                    'LANDSAT_8': ee.ImageCollection("LANDSAT/LC08/C02/T1_L2"),
+                    'LANDSAT_9': ee.ImageCollection("LANDSAT/LC09/C02/T1_L2")}
+
 def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
     """
     This function performs scaling to reflectance and cloud masking on Landsat 4, 5, 7, 8 and 9 and Sentinel-2.
@@ -96,26 +103,31 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
 
         # scale and mask out clouds
         return image.divide(10000).addBands(nbr).updateMask(cloudMask)
-
-
+   
 # Prepare Sentinel or Landsat
-def preProcessXCollection(collection: ee.ImageCollection, region: ee.Geometry, startDate : str, endDate: str)-> ee.ImageCollection:
+def preProcessXCollection(image: ee.Image, nImages: int, returnInterval: int)-> ee.ImageCollection:
     """
-    This function performs spatio-temporal filtering, cloud masking, and then creates a gap-filled composite
-    for Landsat and Sentinel-2.
+    This function performs spatio-temporal filtering, cloud masking for Landsat and Sentinel-2.
     
     """
     # Get satellite name
-    sensor = collection.first().get('SPACECRAFT_ID').getInfo()
+    sensor = image.get('SPACECRAFT_ID').getInfo()
     if sensor is None:
         sensor = 'Sentinel-2'
     # Spatiio-temporal filtering
     logging.info("Preparing X image collection (filtering, scaling, cloud masking)")
-    filteredCollection = collection.filterBounds(region)\
-                        .filterDate(startDate, endDate)\
-                        .map(lambda image: cloudMask(sensor = sensor, image = image))
-    logging.info(f"Prepared {filteredCollection.size().getInfo()} X images")
-    return filteredCollection
+
+    startDate = image.date().advance(-nImages*returnInterval*3, 'day')
+    endDate = image.date()
+    filteredImages = supportedSensors.get(sensor).filterBounds(image.geometry()).filterDate(startDate,endDate)\
+        .filter(ee.Filter.eq('WRS_PATH',image.get('WRS_PATH')))\
+        .filter(ee.Filter.eq('WRS_ROW',image.get('WRS_ROW')))
+    refDate = image.date()
+    result = filteredImages.map(lambda image: image.set('dayDist', refDate.difference(image.date(), 'day'))
+                                ).sort('dayDist').limit(nImages).merge([image])\
+                                .map(lambda image: cloudMask(sensor = sensor, image = image))     
+    logging.info(f"Prepared {nImages+1} X images")
+    return result
 
 def confidenceMask(image: ee.Image)-> ee.Image:
     # Define a function to remove fires with confidence level < 50%

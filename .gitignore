@@ -1,0 +1,4 @@
+# Ignore CSV files that start with 'extract'
+extract*.csv
+# Ignore log files
+*.log

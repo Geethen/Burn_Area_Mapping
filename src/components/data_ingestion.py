@@ -1,9 +1,9 @@
 import sys
 import os
-from src.components.exception import customException
-from logger import logging
-from components.data_transformation import DataTransformation
-from components.model_trainer import ModelTrainer
+from exception import customException
+from src.logger import logging
+from data_transformation import dataTransformation
+from model_trainer import modelTrainer
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
@@ -20,16 +20,27 @@ class dataIngestion:
         self.ingestion_config = dataIngestionConfig()
 
     def initiate_data_ingestion(self):
-        logging.info("Entered the data ingestion method or component")
+        logging.info("Entered the data ingestion component")
 
         try:
-            df = pd.read_csv('notebook\data\stud.csv')
+            # Get a list of all CSV files in the directory
+            csv_files = [file for file in os.listdir(os.getcwd()) if file.startswith('extract_') and file.endswith('.csv')]
+
+            # Initialize an empty DataFrame to store the merged data
+            df = pd.DataFrame()
+
+            # Iterate over each CSV file and merge its data into the merged DataFrame
+            for file in csv_files:
+                file_path = os.path.join(os.getcwd(), file)
+                dfi = pd.read_csv(file_path)
+                df = pd.concat([df, dfi], ignore_index=True)
+                
             logging.info("Read the dataset as dataframe")
 
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path),exist_ok=True)
             df.to_csv(self.ingestion_config.raw_data_path,index=False,header=True)
             
-            logging.info("Train test split initiated")
+            logging.info("Train-test split initiated")
             train_set,test_set = train_test_split(df, test_size=0.2, random_state=42)
             train_set.to_csv(self.ingestion_config.train_data_path,index=False,header=True)
             test_set.to_csv(self.ingestion_config.test_data_path,index=False,header=True)
@@ -43,8 +54,8 @@ class dataIngestion:
 if __name__ == "__main__":
     obj = dataIngestion()
     train_data, test_data = obj.initiate_data_ingestion()
-    data_transformation = DataTransformation()
+    data_transformation = dataTransformation()
     train_arr, test_arr,_ = data_transformation.initiate_data
 
-    model_trainer = ModelTrainer()
+    model_trainer = modelTrainer()
     model_trainer.initiate_model_trainer(train_arr, test_arr)
