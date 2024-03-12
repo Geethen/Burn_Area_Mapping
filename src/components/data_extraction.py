@@ -45,7 +45,7 @@ def getStats(imageCollection: ee.ImageCollection)->pd.DataFrame:
     row['scenes'] = scenes
     return row
 
-def getImages(image: ee.Image, featureCollection: ee.FeatureCollection, Xweeks: int)-> ee.ImageCollection:
+def getImages(image: ee.Image, featureCollection: ee.FeatureCollection)-> ee.ImageCollection:
     """ 
     1) Checks if image is spatio-temporally within a fire event, labels image accordingly and
     2) Gets all prior images associated with creating a feature.
@@ -66,11 +66,6 @@ def getImages(image: ee.Image, featureCollection: ee.FeatureCollection, Xweeks: 
 
     # check if it falls within dateRange of a fire event- set label property
     yImage = ee.Algorithms.If(dateRange.contains(image.date()), image.set('label', 1).copyProperties(image), image.set('label', 0).copyProperties(image))
-
-    # Get satellite name
-    sensor = image.get('SPACECRAFT_ID').getInfo()
-    if sensor is None:
-        sensor = 'Sentinel-2'
 
     # Define datasets, get xweeks nImages prior to image (i.e., get time series info)
     xImages =  preProcessXCollection(image = image, nImages = 4, returnInterval = 16)
@@ -101,7 +96,7 @@ def extractDataset(sensor, country, startDate, endDate, fireEvents, Xweeks: int,
     for idx in tqdm(range(xSize)):
         xImage = ee.Image(xListImages.get(idx))
         # get Ximages and labelled y image
-        xImages, yImage = getImages(xImage, fireEvents, Xweeks)
+        xImages, yImage = getImages(xImage, fireEvents)
         # convert to geodataframe
         try:
             row = getStats(xImages)
@@ -113,6 +108,49 @@ def extractDataset(sensor, country, startDate, endDate, fireEvents, Xweeks: int,
                 outdf.to_csv(file, index=False)
         except Exception as e:
             raise customException(e, sys)
+        
+def getInferenceImages(image: ee.Image)-> ee.ImageCollection:
+    """ 
+    1) Gets all prior images associated with creating a feature.
+    """
+
+    # Define datasets, get nImages prior to image (i.e., get time series info)
+    xImages =  preProcessXCollection(image = image, nImages = 4, returnInterval = 16)
+    return xImages
+        
+def extractInferenceDataset(sensor, country, startDate, endDate)-> pd.DataFrame:
+    """Extracts the dataset from the given image collection
+    
+    Args:
+        sensor (str): 
+        country (ee.Geometry): 
+        startDate (ee.Date): 
+        endDate (ee.Date): 
+
+    Returns:
+        pd.DataFrame
+    
+    """
+    logging.info("Extracting x inference data (extractInferenceDataset)")
+    countryGeom = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017").filter(ee.Filter.eq('country_na', country)).geometry()
+    # filterImages to country of interest
+    filteredImages = supportedSensors.get(sensor).filterBounds(countryGeom).filterDate(startDate, endDate)
+    
+    xSize = filteredImages.size().getInfo()
+    xListImages = filteredImages.toList(xSize)
+
+    outdf = pd.DataFrame()
+    for idx in tqdm(range(xSize)):
+        xImage = ee.Image(xListImages.get(idx))
+        # get Ximages and current image
+        xImages = getInferenceImages(xImage)
+        # convert to geodataframe
+        try:
+            row = getStats(xImages)
+            outdf = pd.concat([outdf, row])
+        except Exception as e:
+            raise customException(e, sys)
+    return outdf
 
 def extractXy (yCollection: ee.FeatureCollection, Xweeks: int, filename):
     """Extracts x and y data from the given collections"""
