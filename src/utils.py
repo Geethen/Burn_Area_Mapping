@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime
 
 import numpy as np
 import pandas as pd
@@ -8,6 +9,30 @@ from sklearn.metrics import matthews_corrcoef, f1_score
 from sklearn.model_selection import (train_test_split, GridSearchCV)
 
 from exception import customException
+
+def delete_old_logs(repo_path, specified_date=None):
+    # If specified_date is not provided, keep logs for the past month
+    if specified_date is None:
+        specified_date = datetime.datetime.now() - datetime.timedelta(days=30)
+    
+    # Iterate over all directories and files in the repository recursively
+    for root, dirs, files in os.walk(repo_path):
+        for file_name in files:
+            # Check if the file name matches the log file format
+            if file_name.endswith('.log'):
+                try:
+                    # Extract the date from the file name
+                    file_date_str = file_name.split('.')[0]
+                    file_date = datetime.datetime.strptime(file_date_str, '%m_%d_%Y_%H_%M_%S')
+                    
+                    # Check if the file date is before the specified date
+                    if file_date < specified_date:
+                        # If yes, delete the file
+                        os.remove(os.path.join(root, file_name))
+                        print(f"Deleted file: {os.path.join(root, file_name)}")
+                except ValueError:
+                    # Handle invalid file names or dates
+                    print(f"Ignored invalid file name: {os.path.join(root, file_name)}")
 
 def save_object(file_path, obj):
     try:
