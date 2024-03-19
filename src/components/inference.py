@@ -26,6 +26,7 @@ supportedSensors = {'Sentinel-2': ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZE
 class modelInferenceConfig:
     model_path = os.path.join('artifacts',"model.pkl")
     dateChecked_path = os.path.join('artifacts',"lastCheckedDate.pkl")
+    downloadList_path = os.path.join('artifacts',"downloadList.pkl")
 
 class Inference:
     def __init__(self):
@@ -91,11 +92,13 @@ class Inference:
         else:
             downloadList = []
             print("There are no new scenes")
+        # Save list of scenes to be downloaded to disk
+        save_object(self.model_config.downloadList_path, downloadList)
         
-        logging.info("There are {len(downloadList)} new scenes")
+        logging.info(f"There are {len(downloadList)} new scenes")
         return downloadList
 
-# If new scenes are available, locate them
+# If new scenes are available, download
 # if nScenes:
 #     # if it includes a fire, download scene to cluster
 #     for sceneix in downloadList:

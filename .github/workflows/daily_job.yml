@@ -1,0 +1,28 @@
+name: Daily Python Script
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs the job every day at midnight UTC
+
+jobs:
+  run_script:
+    name: Run Python script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x' # Use the Python version required for your script
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt # If you have any dependencies, add them to requirements.txt
+
+      - name: Decode secrets file and setup service account key
+        run: |
+          echo ${{ secrets.EE_SERVICE_ACCOUNT_KEY }} | base64 -d > secret.json
+
+      - name: Run Python script
+        run: python stage1_daily.py # Replace with the name of your Python script
