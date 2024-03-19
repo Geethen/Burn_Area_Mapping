@@ -13,6 +13,7 @@ from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 
 from sklearn.metrics import classification_report, confusion_matrix, matthews_corrcoef, f1_score, accuracy_score
+from dvclive import Live
 
 from src.utils import save_object, evaluate_models
 from src.logger import logging
@@ -105,6 +106,11 @@ class modelTrainer:
             )
 
             predicted = best_model.predict(X_test)
+            with Live() as live:
+                live.log_metric("test/f1", f1_score(y_test, predicted, average="weighted"), plot=False)
+                live.log_sklearn_plot(
+                "confusion_matrix", y_test, predicted, name="test/confusion_matrix",
+                title="Test Confusion Matrix")
 
             mcc = matthews_corrcoef(y_test, predicted)
             f1 = f1_score(y_test, predicted)
