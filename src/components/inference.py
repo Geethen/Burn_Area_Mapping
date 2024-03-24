@@ -1,10 +1,9 @@
 import os
 import ee
-try:
-    ee.Initialize()
-except:
-    ee.Initialize()
-    ee.Authenticate()
+
+service_account = 'github-action@ee-geethensingh.iam.gserviceaccount.com'
+credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
+ee.Initialize(credentials)
 
 from datetime import datetime
 import geedim as gd

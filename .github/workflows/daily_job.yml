@@ -22,7 +22,7 @@ jobs:
 
       - name: Decode secrets file and setup service account key
         run: |
-          echo ${{ secrets.EE_SERVICE_ACCOUNT_KEY }} | base64 -d > .github/workflows/secret.json
+          echo ${{ secrets.EE_SERVICE_ACCOUNT_KEY }} | base64 -d > secret.json
 
       - name: Run Python script
         run: python src/components/stage1_daily.py # Replace with the name of your Python script
