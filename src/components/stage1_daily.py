@@ -1,5 +1,4 @@
 import ee
-import os
 from inference import Inference
 
 service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
