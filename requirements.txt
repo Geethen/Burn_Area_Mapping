@@ -3,4 +3,5 @@ pandas
 geopandas
 mapie
 geedim
+tqdm
 -e .

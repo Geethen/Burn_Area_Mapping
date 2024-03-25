@@ -5,7 +5,6 @@ service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
 credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
 ee.Initialize(credentials)
 from tqdm.auto import tqdm
-from geeml.utils import eeprint
 
 from src.logger import logging
 from exception import customException
