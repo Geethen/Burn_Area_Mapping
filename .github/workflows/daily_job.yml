@@ -2,7 +2,7 @@ name: Daily Python Script
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs the job every day at midnight UTC
+    - cron: "55 8 * * *" # Runs the job every day at midnight UTC
 
 jobs:
   run_script:
@@ -20,9 +20,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt # If you have any dependencies, add them to requirements.txt
 
-      - name: Decode secrets file and setup service account key
-        run: |
-          echo ${{ secrets.EE_SERVICE_ACCOUNT_KEY }} | base64 -d > secret.json
+      # - name: Decode secrets file and setup service account key
+      #   run: |
+      #     echo ${{ secrets.EE_SERVICE_ACCOUNT_KEY }} | base64 --decode > secret.json
 
       - name: Run Python script
         run: python src/components/stage1_daily.py # Replace with the name of your Python script
+        env:
+          EE_SERVICE_ACCOUNT_KEY: ${{ secrets.EE_SERVICE_ACCOUNT_KEY }}

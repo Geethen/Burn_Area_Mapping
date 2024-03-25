@@ -1,8 +1,11 @@
 import ee
+import os
 from inference import Inference
 
+my_secret = os.environ.get('EE_SERVICE_ACCOUNT_KEY')
+
 service_account = 'github-action@ee-geethensingh.iam.gserviceaccount.com'
-credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
+credentials = ee.ServiceAccountCredentials(service_account, my_secret)
 ee.Initialize(credentials)
 
 inference_pipeline = Inference()
