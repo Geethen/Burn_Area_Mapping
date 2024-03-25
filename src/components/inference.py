@@ -1,5 +1,6 @@
 import os
 import ee
+import mapie
 
 service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
 credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
