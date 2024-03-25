@@ -6,4 +6,5 @@ geedim
 geeml
 tqdm
 ipython
+pyyaml
 -e .
