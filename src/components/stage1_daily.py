@@ -1,7 +1,7 @@
 import ee
 from inference import Inference
 
-service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
+service_account = 'github-action@ee-geethensingh.iam.gserviceaccount.com'
 credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
 ee.Initialize(credentials)
 
