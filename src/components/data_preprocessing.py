@@ -2,10 +2,9 @@ import ee
 import sys
 import math
 
-try:
-    ee.Initialize()
-except:
-    ee.Authenticate()
+service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
+credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
+ee.Initialize(credentials)
 
 from src.logger import logging
 from exception import customException

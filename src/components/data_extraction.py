@@ -1,11 +1,9 @@
 import pandas as pd
 import ee
 import sys
-try:
-    ee.Initialize()
-except:
-    ee.Authenticate()
-    ee.Initialize()
+service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
+credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
+ee.Initialize(credentials)
 from tqdm.auto import tqdm
 from geeml.utils import eeprint
 
