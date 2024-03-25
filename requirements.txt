@@ -8,4 +8,10 @@ tqdm
 ipython
 pyyaml
 dill
+catboost
+seaborn
+xgboost
+matplotlib
+sklearn
+dvclive
 -e .
