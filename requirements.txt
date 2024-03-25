@@ -7,4 +7,5 @@ geeml
 tqdm
 ipython
 pyyaml
+dill
 -e .
