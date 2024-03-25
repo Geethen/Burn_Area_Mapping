@@ -5,4 +5,5 @@ mapie
 geedim
 geeml
 tqdm
+ipython
 -e .
