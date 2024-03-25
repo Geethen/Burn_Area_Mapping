@@ -12,6 +12,6 @@ catboost
 seaborn
 xgboost
 matplotlib
-sklearn
+scikit-learn
 dvclive
 -e .
