@@ -1,8 +1,9 @@
 name: Daily Python Script
 
 on:
+  push:
   schedule:
-    - cron: "30 9 * * *" # Runs the job every day at midnight UTC
+    - cron: "0 22 * * *" # Runs the job every day at midnight SAST
 
 jobs:
   run_script:
