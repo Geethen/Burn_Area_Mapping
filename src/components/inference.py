@@ -1,5 +1,6 @@
 import os
 import ee
+import sys
 import mapie
 
 service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
@@ -12,6 +13,7 @@ import geedim as gd
 from data_extraction import extractInferenceDataset
 from src.utils import save_object, load_object
 from src.logger import logging
+from exception import customException
 
 from dataclasses import dataclass
 
@@ -73,30 +75,43 @@ class Inference:
         
 
     def initiate_inference_pipeline(self, sensor, country):
-        """Return predictions and name of scenes with fires"""
+        """
+        Conducts inference pipeline for fire detection.
+
+        Args:
+            sensor (str): Type of sensor used for data collection.
+            country (str): Country for which the inference is performed.
+
+        Returns:
+            list: List of scenes with fires.
+        """
         logging.info("Entering inference pipeline")
-        if self.collectionUpdates(supportedSensors.get(sensor), country= country):
-            # extract covariates and prepare data for inference.
-            # Get current date
-            current_date = datetime.now().date()
-            # Format the current date as "YYYY-MM-DD"
-            current_formattedDate = ee.Date(current_date.strftime("%Y-%m-%d"))
-            last_checked = load_object(self.model_config.dateChecked_path)
-            print("input dates", last_checked, current_date)
-            df = extractInferenceDataset(sensor, country, ee.Date(last_checked), current_formattedDate)
-            last_checked = datetime.now().date()
-            # make prediction
-            downloadList = self.getPredictions(df)
-            # overwrite last_checked with current date
-            save_object(self.model_config.dateChecked_path, current_formattedDate)
-        else:
-            downloadList = []
-            print("There are no new scenes")
-        # Save list of scenes to be downloaded to disk
-        save_object(self.model_config.downloadList_path, downloadList)
-        
-        logging.info(f"There are {len(downloadList)} new scenes")
-        return downloadList
+        try:
+            if self.collectionUpdates(supportedSensors.get(sensor), country= country):
+                # extract covariates and prepare data for inference.
+                # Get current date
+                current_date = datetime.now().date()
+                # Format the current date as "YYYY-MM-DD"
+                current_formattedDate = ee.Date(current_date.strftime("%Y-%m-%d"))
+                last_checked = load_object(self.model_config.dateChecked_path)
+                print("input dates", last_checked, current_date)
+                df = extractInferenceDataset(sensor, country, ee.Date(last_checked), current_formattedDate)
+                last_checked = datetime.now().date()
+                # make prediction
+                downloadList = self.getPredictions(df)
+                # overwrite last_checked with current date
+                save_object(self.model_config.dateChecked_path, current_formattedDate)
+            else:
+                downloadList = []
+                print("There are no new scenes")
+            # Save list of scenes to be downloaded to disk
+            save_object(self.model_config.downloadList_path, downloadList)
+            
+            # logging.info(f"There are {len(downloadList)} new scenes")
+            return downloadList
+        except Exception as e:
+            raise customException(e, sys)
+
 
 # If new scenes are available, download
 # if nScenes:
