@@ -106,13 +106,21 @@ class modelTrainer:
             )
 
             predicted = best_model.predict(X_test)
+            # dvc register model for tracking, and log metrics and confusion metric
             with Live() as live:
+                # live.log_artifact(
+                #     self.model_trainer_config.trained_model_file_path,
+                #     type="model",
+                #     name="BurnArea-classification",
+                #     desc="This is a Scene-level classification model to discern satellite images with burn areas.",
+                #     labels=["scene-level", "classification", "satellite-images"],
+                # )
                 live.log_metric("test/f1", f1_score(y_test, predicted, average="weighted"), plot=False)
+                live.log_metric("test/mcc", matthews_corrcoef(y_test, predicted), plot=False)
                 live.log_sklearn_plot(
                 "confusion_matrix", y_test, predicted, name="test/confusion_matrix",
                 title="Test Confusion Matrix")
 
-            mcc = matthews_corrcoef(y_test, predicted)
             f1 = f1_score(y_test, predicted)
             print("classification report", classification_report(y_test, predicted))
 
@@ -126,5 +134,3 @@ class modelTrainer:
             return f1
         except Exception as e:
             raise customException(e, sys)
-
-
