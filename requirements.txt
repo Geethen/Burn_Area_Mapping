@@ -3,5 +3,6 @@ pandas
 geopandas
 mapie
 geedim
+geeml
 tqdm
 -e .
