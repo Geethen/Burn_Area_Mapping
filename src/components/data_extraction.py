@@ -1,15 +1,21 @@
 import pandas as pd
 import ee
 import sys
-service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
-credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
-ee.Initialize(credentials)
 from tqdm.auto import tqdm
 
 from src.logger import logging
 from exception import customException
 from geeml.extract import extractor
 from data_preprocessing import preProcessXCollection
+
+try:
+    service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
+    credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
+    ee.Initialize(credentials)
+except Exception as e:
+    ee.Authenticate()
+    ee.Initialize()
+    customException = customException(e, sys)
 
 supportedSensors = {'Sentinel-2': ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED"),
                     'LANDSAT_4': ee.ImageCollection("LANDSAT/LT04/C02/T1_L2"),

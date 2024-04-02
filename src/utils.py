@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 import dill
 from sklearn.metrics import matthews_corrcoef, f1_score
-from sklearn.model_selection import (train_test_split, GridSearchCV)
+from sklearn.model_selection import (GridSearchCV)
+from mapie.classification import MapieClassifier
 
 from exception import customException
 
@@ -50,10 +51,8 @@ def load_object(file_path):
     except Exception as e:
         raise customException(e, sys)
         
-def evaluate_models(X, y, models, param):
+def evaluate_models(X_train, y_train, X_test, y_test, models, param):
     try:
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
         report = {}
 
         for i in range(len(list(models))):
@@ -62,16 +61,14 @@ def evaluate_models(X, y, models, param):
             para=param[list(models.keys())[i]]
 
             gs = GridSearchCV(model,para,cv=3)
-            gs.fit(X_train,y_train)
+            gs.fit(X_train, y_train)
 
-            model.set_params(**gs.best_params_)
+            model.set_params(**gs.best_params_, random_state=42)
             model.fit(X_train,y_train)
 
             y_test_pred = model.predict(X_test)
 
-            test_model_score = matthews_corrcoef(y_test, y_test_pred)
-            print("MCC", test_model_score)
-            test_model_score = f1_score(y_test, y_test_pred)
+            test_model_score = f1_score(y_test, y_test_pred, average= 'weighted')
 
             report[list(models.keys())[i]] = test_model_score
         return report

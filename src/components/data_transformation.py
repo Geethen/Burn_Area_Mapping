@@ -1,14 +1,18 @@
 import sys
 import os
 import ee
-try:
-    ee.Initialize()
-except:
-    ee.Authenticate()
-    ee.Initialize()
 
 from exception import customException
 from src.utils import save_object
+
+try:
+    service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
+    credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
+    ee.Initialize(credentials)
+except Exception as e:
+    ee.Authenticate()
+    ee.Initialize()
+    customException = customException(e, sys)
 
 from src.logger import logging
 import pandas as pd
@@ -70,12 +74,13 @@ class dataTransformation:
         except Exception as e:
             raise customException(e,sys)
 
-    def initiate_data_transformation(self,train_path,test_path):
+    def initiate_data_transformation(self,train_path, calibration_path, test_path):
         try:
             train_df = pd.read_csv(train_path)
+            calibration_df = pd.read_csv(calibration_path)
             test_df = pd.read_csv(test_path)
 
-            logging.info("Read train and test data completed")
+            logging.info("Read train, calibration and test data completed")
 
             logging.info("Obtaining preprocessing object")
 
@@ -87,6 +92,9 @@ class dataTransformation:
             input_feature_train_df = train_df.drop(columns=[target_column_name, dropCols],axis=1)
             target_feature_train_df = train_df[target_column_name]
 
+            input_feature_cal_df = calibration_df.drop(columns=[target_column_name, dropCols],axis=1)
+            target_feature_cal_df = calibration_df[target_column_name]
+
             input_feature_test_df = test_df.drop(columns=[target_column_name, dropCols],axis=1)
             target_feature_test_df = test_df[target_column_name]
 
@@ -96,13 +104,13 @@ class dataTransformation:
             # input_feature_test_arr = preprocessing_obj.transform(input_feature_test_df)
 
             train_arr = np.c_[input_feature_train_df.values, np.array(target_feature_train_df)]
-
+            calibration_arr = np.c_[input_feature_cal_df.values, np.array(target_feature_cal_df)]
             test_arr = np.c_[input_feature_test_df.values, np.array(target_feature_test_df)]
 
             # logging.info("Saved preprocessing object.")
             # save_object(file_path=self.data_transformation_config.preprocessed_object_file_path, obj = preprocessing_obj)
 
-            return (train_arr,test_arr)
+            return (train_arr, calibration_arr, test_arr)
 
         except Exception as e:
             raise customException(e, sys)

@@ -1,13 +1,11 @@
 import os
 import ee
 import sys
+import numpy as np
 import mapie
 
-service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
-credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
-ee.Initialize(credentials)
-
 from datetime import datetime
+from dataclasses import dataclass
 import geedim as gd
 
 from data_extraction import extractInferenceDataset
@@ -15,7 +13,15 @@ from src.utils import save_object, load_object
 from src.logger import logging
 from exception import customException
 
-from dataclasses import dataclass
+try:
+    service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
+    credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
+    ee.Initialize(credentials)
+except Exception as e:
+    ee.Authenticate()
+    ee.Initialize()
+    customException = customException(e, sys)
+
 
 supportedSensors = {'Sentinel-2': ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED"),
                     'LANDSAT_4': ee.ImageCollection("LANDSAT/LT04/C02/T1_L2"),
@@ -56,7 +62,7 @@ class Inference:
         try:
             last_checked = load_object(self.model_config.dateChecked_path)
         except Exception:
-            last_checked = "2024-02-24"
+            last_checked = "2024-03-01"
             save_object(self.model_config.dateChecked_path, last_checked)
         nScenes = imageCollection.filterBounds(self.country.geometry()).filterDate(ee.Date(last_checked), current_formattedDate).size().getInfo()
         print("Number of new scenes:", nScenes)
@@ -65,7 +71,11 @@ class Inference:
     def getPredictions(self, df):
         model = load_object(self.model_config.model_path)
         dfPredict = df.drop(['scenes'], axis=1)
-        mask = model.predict(dfPredict).astype(bool)
+        _, pred_sets = model.predict(dfPredict, alpha = 0.05)
+        def create_mask(arr):
+            mask = ~np.all(arr == [True, False], axis=1)
+            return mask
+        mask = create_mask(np.squeeze(pred_sets))
         if mask.sum() > 1:
             # Select rows where the mask is True
             sceneIds = df[mask]['scenes'].apply(lambda x: x[-1])
