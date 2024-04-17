@@ -2,9 +2,8 @@
 Contains functionality for creating PyTorch DataLoaders for 
 semantic segmentation data.
 """
-from torchgeo.datasets import RasterDataset, unbind_samples, stack_samples
+from torchgeo.datasets import RasterDataset,  stack_samples
 from torchgeo.samplers import RandomGeoSampler, Units
-from torchgeo.transforms import indices
 from torch.utils.data import DataLoader
 from ensure import ensure_annotations
 
@@ -14,7 +13,6 @@ def create_dataloaders(
     test_dir: str, 
     crs: str = 'epsg:4326',
     res: float = 0.00025,
-    transform = None,
     img_size: int = 512,
     n_trainimages: int = 100,
     n_testimages: int = 50,
@@ -33,25 +31,21 @@ def create_dataloaders(
     crs: The CRS of the dataset. Defaults to EPSG:4326.
     res: The pixel size of the images in units of the CRS. For the default EPSG:4326,
       30m is provided as 0.00025 decimal degrees.
-    transform: torchvision transforms to perform on training and testing data.
     batch_size: Number of samples per batch in each of the DataLoaders.
     num_workers: An integer for number of workers per DataLoader.
 
   Returns:
-    A tuple of (train_dataloader, test_dataloader, class_names).
-    Where class_names is a list of the target classes.
+    A tuple of (train_dataloader, test_dataloader).
     Example usage:
-      train_dataloader, test_dataloader, class_names = \
+      train_dataloader, test_dataloader = \
         = create_dataloaders(train_dir=path/to/train_dir,
                              test_dir=path/to/test_dir,
-                             transform=some_transform,
-                             batch_size=32,
-                             num_workers=4)
+                             batch_size=8)
   """
-  train_imgs = RasterDataset(paths=(train_dir/'images').as_posix(), crs= crs, res= res, transforms= transform)
+  train_imgs = RasterDataset(paths=(train_dir/'images').as_posix(), crs= crs, res= res)
   train_msks = RasterDataset(paths=(train_dir/'masks').as_posix(), crs= crs, res= res)
 
-  valid_imgs = RasterDataset(paths=(test_dir/'images').as_posix(), crs= crs, res= res, transforms= transform)
+  valid_imgs = RasterDataset(paths=(test_dir/'images').as_posix(), crs= crs, res= res)
   valid_msks = RasterDataset(paths=(test_dir/'masks').as_posix(), crs= crs, res= res)
 
   # IMPORTANT
