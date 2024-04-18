@@ -8,6 +8,7 @@ ee.Initialize(credentials)
 
 # Get the current working directory
 current_directory = os.getcwd()
+print(current_directory)
 
 # Define the relative path to the target directory
 relative_path = "src/components"
