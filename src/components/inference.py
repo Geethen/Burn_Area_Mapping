@@ -9,8 +9,8 @@ from dataclasses import dataclass
 import geedim as gd
 
 from data_extraction import extractInferenceDataset
-from src.utils import save_object, load_object
-from src.logger import logging
+from utils import save_object, load_object
+from logger import logging
 from exception import customException
 
 try:
