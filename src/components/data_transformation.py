@@ -3,7 +3,7 @@ import os
 import ee
 
 from exception import customException
-from src.utils import save_object
+from utils import save_object
 
 try:
     service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
@@ -14,7 +14,7 @@ except Exception as e:
     ee.Initialize()
     customException = customException(e, sys)
 
-from src.logger import logging
+from logger import logging
 import pandas as pd
 import numpy as np
 from dataclasses import dataclass

@@ -2,7 +2,7 @@ import ee
 import sys
 import math
 
-from src.logger import logging
+from logger import logging
 from exception import customException
 
 try:
