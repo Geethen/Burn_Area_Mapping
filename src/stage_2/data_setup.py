@@ -7,7 +7,7 @@ from torchgeo.samplers import RandomGeoSampler, Units
 from torch.utils.data import DataLoader
 from ensure import ensure_annotations
 
-@ensure_annotatons
+@ensure_annotations
 def create_dataloaders(
     train_dir: str, 
     test_dir: str, 
