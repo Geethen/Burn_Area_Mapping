@@ -3,7 +3,7 @@ import ee
 import sys
 from tqdm.auto import tqdm
 
-from src.logger import logging
+from logger import logging
 from exception import customException
 from geeml.extract import extractor
 from data_preprocessing import preProcessXCollection
