@@ -121,10 +121,3 @@ class Inference:
             return downloadList
         except Exception as e:
             raise customException(e, sys)
-
-
-# If new scenes are available, download
-# if nScenes:
-#     # if it includes a fire, download scene to cluster
-#     for sceneix in downloadList:
-#         gd.BaseImage.download()
