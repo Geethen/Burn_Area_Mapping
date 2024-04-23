@@ -42,11 +42,11 @@ def create_dataloaders(
                              test_dir=path/to/test_dir,
                              batch_size=8)
   """
-  train_imgs = RasterDataset(paths=(train_dir/'images').as_posix(), crs= crs, res= res)
-  train_msks = RasterDataset(paths=(train_dir/'masks').as_posix(), crs= crs, res= res)
+  train_imgs = RasterDataset(paths=(train_dir+'/images'), crs= crs, res= res)
+  train_msks = RasterDataset(paths=(train_dir+'/masks'), crs= crs, res= res)
 
-  valid_imgs = RasterDataset(paths=(test_dir/'images').as_posix(), crs= crs, res= res)
-  valid_msks = RasterDataset(paths=(test_dir/'masks').as_posix(), crs= crs, res= res)
+  valid_imgs = RasterDataset(paths=(test_dir+'/images'), crs= crs, res= res)
+  valid_msks = RasterDataset(paths=(test_dir+'/masks'), crs= crs, res= res)
 
   # IMPORTANT
   train_msks.is_image = False

@@ -4,7 +4,8 @@ Trains a PyTorch image classification model using device-agnostic code.
 
 import argparse
 import torch
-from src.stage2 import data_setup, engine, utils
+import data_setup, engine, utils
+from sklearn.metrics import jaccard_score
 from torchgeo.datasets import RasterDataset
 from torchgeo.transforms import indices, AugmentationSequential
 import segmentation_models_pytorch as smp
@@ -30,7 +31,7 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # setup normalisation
-    train_imgs = RasterDataset(paths=(train_dir/'images').as_posix(), crs='epsg:4326', res= 0.00025)
+    train_imgs = RasterDataset(paths=(train_dir+'/images'), crs='epsg:4326', res= 0.00025)
     mean, std = utils.calc_statistics(train_imgs)
     normalize = utils.MyNormalize(mean=mean, stdev=std)
 
@@ -46,7 +47,8 @@ def main():
     train_dataloader, test_dataloader = data_setup.create_dataloaders(
         train_dir=train_dir,
         test_dir=test_dir,
-        transform=data_transform,
+        n_trainimages = 158,
+        n_testimages = 69,
         batch_size=args.batch_size
     )
 
@@ -59,7 +61,21 @@ def main():
     ).to(device)
 
     # Set loss and optimizer
-    loss_fn = torch.nn.BCELoss()
+    def loss_fn(p, t):    
+        return torch.nn.functional.cross_entropy(p, t.squeeze())
+
+    def oa(pred, y):
+        flat_y = y.squeeze()
+        flat_pred = pred.argmax(dim=1)
+        acc = torch.count_nonzero(flat_y == flat_pred) / torch.numel(flat_y)
+        return acc
+
+    def iou(pred, y):
+        flat_y = y.cpu().numpy().squeeze()
+        flat_pred = pred.argmax(dim=1).detach().cpu().numpy()
+        return jaccard_score(flat_y.reshape(-1), flat_pred.reshape(-1), zero_division=1.)
+    
+    acc_fns = [oa, iou]
     optimizer = torch.optim.Adam(model.parameters(),
                                  lr=args.learning_rate, weight_decay=args.weight_decay)
 
@@ -67,9 +83,12 @@ def main():
     engine.train(model=model,
                  train_dataloader=train_dataloader,
                  test_dataloader=test_dataloader,
+                 batch_tfms= data_transform,
                  loss_fn=loss_fn,
+                 acc_fns= acc_fns,
                  optimizer=optimizer,
                  epochs=args.epochs,
+                 callbacks= {'metric_index': 1, 'save_model_path': r"C:\Users\coach\myfiles\postdoc\Fire\code\Burn_Area_Mapping\src\components\artifacts\segModel_22042024.pth"},
                  device=device)
 
 if __name__ == "__main__":
