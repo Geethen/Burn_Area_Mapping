@@ -2,7 +2,7 @@ import sys
 import os
 import ee
 
-from src.exception import customException
+from exception import customException
 from utils import save_object
 
 try:

@@ -21,7 +21,7 @@ from dvclive import Live
 
 from utils import save_object, evaluate_models
 from logger import logging
-from src.exception import customException
+from exception import customException
 
 @dataclass
 class modelTrainerConfig:

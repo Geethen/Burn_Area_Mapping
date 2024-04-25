@@ -3,7 +3,7 @@ import sys
 import math
 
 from logger import logging
-from src.exception import customException
+from exception import customException
 
 try:
     service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
