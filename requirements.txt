@@ -17,4 +17,5 @@ dvclive
 ensure
 rasterio
 torch
+torchgeo
 -e .
