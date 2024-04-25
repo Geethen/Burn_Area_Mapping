@@ -4,7 +4,7 @@ import sys
 from tqdm.auto import tqdm
 
 from logger import logging
-from exception import customException
+from src.exception import customException
 from geeml.extract import extractor
 from data_preprocessing import preProcessXCollection
 

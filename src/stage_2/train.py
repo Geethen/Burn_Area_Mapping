@@ -1,10 +1,11 @@
 """
 Trains a PyTorch image classification model using device-agnostic code.
 """
-
+import os
 import argparse
 import torch
 import data_setup, engine, utils
+from src.utils import load_object, save_object
 from sklearn.metrics import jaccard_score
 from torchgeo.datasets import RasterDataset
 from torchgeo.transforms import indices, AugmentationSequential
@@ -30,9 +31,21 @@ def main():
     # Setup target device
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # setup normalisation
-    train_imgs = RasterDataset(paths=(train_dir+'/images'), crs='epsg:4326', res= 0.00025)
-    mean, std = utils.calc_statistics(train_imgs)
+    # Check if norm_vals pickle file exists in the artifacts folder
+    norm_vals_file = os.path.join(r'src/components/artifacts', "norm_vals.pkl")
+
+    if not os.path.exists(norm_vals_file):
+        # Compute mean and std deviation
+        train_imgs = RasterDataset(paths=(train_dir+'/images'), crs='epsg:4326', res=0.00025)
+        mean, std = utils.calc_statistics(train_imgs)
+
+        # Save mean and std deviation to pickle file
+        save_object(norm_vals_file, (mean, std))
+    else:
+        # Load mean and std deviation from pickle file
+        mean, std = load_object(norm_vals_file)
+
+    # Setup normalization
     normalize = utils.MyNormalize(mean=mean, stdev=std)
 
     # Create transforms

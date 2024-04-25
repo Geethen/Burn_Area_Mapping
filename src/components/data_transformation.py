@@ -2,7 +2,7 @@ import sys
 import os
 import ee
 
-from exception import customException
+from src.exception import customException
 from utils import save_object
 
 try:
@@ -23,9 +23,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
-
-
 
 @dataclass
 class dataTransformationConfig:

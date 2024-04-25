@@ -1,28 +1,35 @@
+import sys
 import os
-import ee
-
-from utils import load_object
-from dataclasses import dataclass
-import geedim as gd
-import torch
-import rasterio as rio
 import math
-import numpy as np
 from pathlib import Path
-from utils import normalise_input, denormalise_output
+import rasterio as rio
+import torch
 from torchvision import transforms
-
-from logging import Logger
+import segmentation_models_pytorch as smp
+from geedim.download import BaseImage
+from torchgeo.transforms import indices, AugmentationSequential
 
 # Parallel compute
 from tqdm.auto import tqdm
 import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 import logging
-import warnings
 
-def inference(infile, model, outfile, patchSize, num_workers=4, device:str = None):
+from src.exception import customException
+from src.utils import load_object, MyNormalize
+from dataclasses import dataclass
+
+import ee
+try:
+    service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
+    credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')
+    ee.Initialize(credentials)
+except Exception as e:
+    ee.Authenticate()
+    ee.Initialize()
+    customException = customException(e, sys)
+
+def inference(infile, imgTransforms, model, outfile, patchSize, num_workers=4, device:str = None):
     """
     Run inference using model on infile block-by-block and write to a new file (outfile). 
     In the case, that the infile image width/height is not exactly divisible by 32, padding
@@ -61,17 +68,15 @@ def inference(infile, model, outfile, patchSize, num_workers=4, device:str = Non
                 with read_lock:
                     src_array = src.read(window=window)#nbands, nrows, ncols(4, h, w)
                     w, h = src_array.shape[1], src_array.shape[2]
-                    image = normalise_input(torch.from_numpy(src_array))
-                    image = torch.from_numpy(np.expand_dims(image, axis=0)).to(device, dtype=torch.float)#(1, h, w, 4)
+                    image = imgTransforms({"image": torch.from_numpy(src_array)})['image']
+                    image = image.to(device, dtype=torch.float)#(1, h, w, 4)
                     hpad = math.ceil(h/32)*32-h
                     wpad = math.ceil(w/32)*32-w
                     transform = transforms.Pad((0, 0, hpad, wpad))
                     # add padding to image
                     image = transform(image)
                     model.eval()
-                    output = model(image)#(1,1,h,w)
-                    #denormalize output
-                    output = denormalise_output(output.squeeze())
+                    output = model(image)[:, 1, :, :].squeeze()#(1,1,h,w)
                     # remove padding
                     result = output[0:w, 0:h].detach().cpu()
                     # plt.imshow(result.numpy())
@@ -94,26 +99,54 @@ def inference(infile, model, outfile, patchSize, num_workers=4, device:str = Non
                         logger.info('Cancelling...')
                         executor.shutdown(wait=False, cancel_futures=True)
                         raise ex        
-
 @dataclass
 class segModelConfig:
-    downloadList_path = os.path.join('artifacts',"downloadList.pkl")
-    model_path = os.path.join('artifacts',"model.pth")
+    downloadList_path = os.path.join('componenets/artifacts',"downloadList.pkl")
+    model_path = os.path.join('componenets/artifacts',"segModel_22042024.pth")
+    norm_vals_path = os.path.join('componenets/artifacts',"norm_vals.pkl")
 
 class segment():
     def __init__(self):
         self.inference_config = segModelConfig()
 
-    def downloadScenes(self):
+    def main(self):
+        # check which scenes need to be downloaded
         downloadList = load_object(self.inference_config.downloadList_path)
 
         if len(downloadList)>0:
-            model = torch.load_model(self.inference_config.model_path)
-            device = 'cuda' if torch.cuda.is_available() else 'cpu'
-            for img in downloadList:
-                eeImage = ee.Image(img)
-                # load image
-                downloadPath = os.path.join('artifacts', f"{img}.tif")
-                dd = r"C:\Users\coach\myfiles\conservation\Handover\TCH\Data\outputs\DNN/pred_MANet_TCH_Netherlands_windows.tif"
-                gd.BaseImage(eeImage).download(downloadPath)
-                inference(infile = downloadPath, model = model, outfile = dd, patchSize = 512, num_workers=10, device = device)
+            # load image
+            for img in downloadList[:1]:
+                # load image based on image id
+                eeImg = ee.Image.load(f'LANDSAT/LC08/C02/T1_TOA/{img[2:]}').select(["B1","B2","B3","B4","B5","B6","B7","B9"])
+                # download scenes
+                downloadPath = os.path.join('artifacts/segScenes', f"{img[2:]}.tif")
+                BaseImage(eeImg).download(downloadPath, crs='EPSG:4326', region= eeImg.geometry(), scale=30, overwrite=True, num_threads=20, dtype= 'float64')
+                #load model
+                device = 'cuda' if torch.cuda.is_available() else 'cpu'
+                model = smp.Unet(
+                    encoder_name="resnet34",        
+                    encoder_weights= None,     
+                    in_channels=10,                  
+                    classes=2,  
+                ).to(device)
+                checkpoint = torch.load(self.inference_config.model_path)
+                model.load_state_dict(checkpoint)
+                # load transforms
+                mean, std = load_object(self.inference_config.norm_vals_path)
+                normalize = MyNormalize(mean=mean, stdev=std)
+
+                # Create transforms
+                data_transform = AugmentationSequential(
+                    indices.AppendNDWI(index_green=2, index_nir=4),
+                    indices.AppendNDVI(index_nir=4, index_red=3),
+                    normalize,
+                    data_keys = ["image"]
+                )
+                # run inference
+                #5min13s to download and 1min to run inference
+                dd = os.path.join('artifacts/segScenes/predictions', f"pred_{img[2:]}.tif")
+                inference(infile = downloadPath, imgTransforms= data_transform, model = model, outfile = dd, patchSize = 512, num_workers=10, device = device)
+                # upload to gee imagecollection
+
+if __name__ == '__main__':
+    segment().main()

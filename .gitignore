@@ -2,3 +2,5 @@
 extract*.csv
 # Ignore log files
 *.log
+# ignore tif files
+*.tif
