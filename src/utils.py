@@ -11,9 +11,8 @@ import rasterio as rio
 from torchgeo.datasets import RasterDataset
 from typing import List
 import dill
-from sklearn.metrics import matthews_corrcoef, f1_score
+from sklearn.metrics import f1_score
 from sklearn.model_selection import (GridSearchCV)
-from mapie.classification import MapieClassifier
 
 from exception import customException
 
