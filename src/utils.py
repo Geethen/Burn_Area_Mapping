@@ -14,7 +14,7 @@ import dill
 from sklearn.metrics import f1_score
 from sklearn.model_selection import (GridSearchCV)
 
-from exception import customException
+from src.exception import customException
 
 def save_model(model: torch.nn.Module,
                target_dir: str,

@@ -101,9 +101,9 @@ def inference(infile, imgTransforms, model, outfile, patchSize, num_workers=4, d
                         raise ex        
 @dataclass
 class segModelConfig:
-    downloadList_path = os.path.join('componenets/artifacts',"downloadList.pkl")
-    model_path = os.path.join('componenets/artifacts',"segModel_22042024.pth")
-    norm_vals_path = os.path.join('componenets/artifacts',"norm_vals.pkl")
+    downloadList_path = os.path.join('components/artifacts',"downloadList.pkl")
+    model_path = os.path.join('components/artifacts',"segModel_22042024.pth")
+    norm_vals_path = os.path.join('components/artifacts',"norm_vals.pkl")
 
 class segment():
     def __init__(self):
