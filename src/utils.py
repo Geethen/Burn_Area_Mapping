@@ -4,6 +4,10 @@ Contains various utility functions for PyTorch model training and saving.
 import os
 import sys
 import datetime
+import shutil
+import random
+
+from tqdm.auto import tqdm
 
 import torch
 from pathlib import Path
@@ -151,6 +155,70 @@ def load_object(file_path):
             return dill.load(file_obj)
     except Exception as e:
         raise customException(e, sys)
+    
+import os
+import shutil
+import random
+from tqdm.auto import tqdm
+
+def split_data(root, image_folder, mask_folder, train_ratio=0.8, seed=None, fromRep= None, toRep=None):
+    """
+    Split images into train and test and move images intp respective directories.
+
+    Args:
+        
+
+    # Example usage
+    dirname = r"path/to/images"
+    split_data(dirname, 'X', 'Y', train_ratio=0.7, seed=42, fromRep='image_', toRep='label_')
+    """
+    # Create train and test directories if they don't exist
+    train_dir = os.path.join(root, 'train')
+    test_dir = os.path.join(root, 'test')
+    os.makedirs(train_dir, exist_ok=True)
+    os.makedirs(test_dir, exist_ok=True)
+
+    # Create image and mask folders within train and test directories
+    train_image_dir = os.path.join(train_dir, 'images')
+    train_mask_dir = os.path.join(train_dir, 'masks')
+    test_image_dir = os.path.join(test_dir, 'images')
+    test_mask_dir = os.path.join(test_dir, 'masks')
+    os.makedirs(train_image_dir, exist_ok=True)
+    os.makedirs(train_mask_dir, exist_ok=True)
+    os.makedirs(test_image_dir, exist_ok=True)
+    os.makedirs(test_mask_dir, exist_ok=True)
+
+    # Get list of TIFF image filenames
+    image_filenames = [filename for filename in os.listdir(os.path.join(root, image_folder)) if filename.endswith('.tif')]
+
+    # Set random seed for reproducibility
+    random.seed(seed)
+
+    # Randomly shuffle filenames
+    random.shuffle(image_filenames)
+
+    # Calculate number of samples for train and test
+    num_samples = len(image_filenames)
+    num_train_samples = int(num_samples * train_ratio)
+    num_test_samples = num_samples - num_train_samples
+
+    # Split images into train and test sets
+    train_images = image_filenames[:num_train_samples]
+    test_images = image_filenames[num_train_samples:]
+
+    # Move images and masks to train and test directories
+    for image_name in tqdm(train_images, desc='Copying train images and masks'):
+        shutil.copy(os.path.join(root, image_folder, image_name), os.path.join(train_image_dir, image_name))
+        mask_name = image_name.replace(fromRep, toRep)
+        shutil.copy(os.path.join(root, mask_folder, mask_name), os.path.join(train_mask_dir, mask_name))
+
+    for image_name in tqdm(test_images, desc='Copying test images and masks'):
+        shutil.copy(os.path.join(root, image_folder, image_name), os.path.join(test_image_dir, image_name))
+        mask_name = image_name.replace(fromRep, toRep)
+        shutil.copy(os.path.join(root, mask_folder, mask_name), os.path.join(test_mask_dir, mask_name))
+
+    print("Data split completed. Train samples:", num_train_samples, "Test samples:", num_test_samples)
+
         
 def evaluate_models(X_train, y_train, X_test, y_test, models, param):
     try:

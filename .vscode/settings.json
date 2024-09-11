@@ -1,3 +1,5 @@
 {
-    "CodeGPT.apiKey": "Groq"
+    "CodeGPT.apiKey": "Groq",
+    "CodeGPT.Autocomplete.enabled": false,
+    "CodeGPT.Autocomplete.provider": "Ollama - codeqwen:code"
 }
