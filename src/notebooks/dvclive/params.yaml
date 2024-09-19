@@ -2,4 +2,4 @@ lr: 0.0025
 weight_decay: 0.01
 epochs: 100
 metric_index: 1
-save_model_path: C:\Users\coach\myfiles\postdoc\Fire\models\UNet_16082024.pth
+save_model_path: C:\Users\coach\myfiles\postdoc\Fire\models\FTDLV3P_12092024.pth
