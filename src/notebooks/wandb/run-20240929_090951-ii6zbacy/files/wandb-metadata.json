@@ -1,0 +1,31 @@
+{
+  "os": "Windows-10-10.0.22631-SP0",
+  "python": "3.9.13",
+  "startedAt": "2024-09-29T07:09:51.702858Z",
+  "program": "c:\\Users\\coach\\myfiles\\postdoc\\Fire\\code\\Burn_Area_Mapping\\src\\notebooks\\Segmentation.ipynb",
+  "git": {
+    "remote": "https://github.com/Geethen/Burn_Area_Mapping.git",
+    "commit": "2b0d31a124fc864863892c9b8b175d67765fadfe"
+  },
+  "email": "geethen.singh@gmail.com",
+  "root": "c:\\Users\\coach\\myfiles\\postdoc\\Fire\\code\\Burn_Area_Mapping\\src\\notebooks",
+  "host": "DESKTOP-SOM8S5C",
+  "username": "coach",
+  "executable": "c:\\ProgramData\\Anaconda3\\envs\\erthy\\python.exe",
+  "codePathLocal": "Segmentation.ipynb",
+  "cpu_count": 6,
+  "cpu_count_logical": 12,
+  "disk": {
+    "/": {
+      "total": "488717152256",
+      "used": "476374159360"
+    }
+  },
+  "memory": {
+    "total": "16929980416"
+  },
+  "cpu": {
+    "count": 6,
+    "countLogical": 12
+  }
+}

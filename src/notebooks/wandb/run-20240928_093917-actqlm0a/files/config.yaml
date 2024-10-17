@@ -1,0 +1,59 @@
+_wandb:
+    value:
+        cli_version: 0.18.1
+        m: []
+        python_version: 3.9.13
+        t:
+            "1":
+                - 1
+                - 2
+                - 3
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 54
+                - 55
+                - 63
+                - 74
+                - 79
+                - 105
+            "2":
+                - 1
+                - 2
+                - 3
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 54
+                - 55
+                - 63
+                - 74
+                - 79
+                - 105
+            "3":
+                - 2
+                - 13
+                - 19
+                - 23
+                - 55
+            "4": 3.9.13
+            "5": 0.18.1
+            "6": 4.42.3
+            "8":
+                - 1
+                - 3
+                - 5
+            "12": 0.18.1
+            "13": windows-amd64
+epochs:
+    value: 100
+learning_rate:
+    value: 0.0025
+metric_index:
+    value: 1
+save_model_path:
+    value: C:\Users\coach\myfiles\postdoc\Fire\models\FTUnet_convnextT_28092024.pth

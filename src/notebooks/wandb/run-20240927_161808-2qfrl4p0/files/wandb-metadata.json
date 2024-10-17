@@ -1,0 +1,23 @@
+{
+    "os": "Windows-10-10.0.22631-SP0",
+    "python": "3.9.13",
+    "heartbeatAt": "2024-09-27T14:18:09.182781",
+    "startedAt": "2024-09-27T14:18:08.134192",
+    "docker": null,
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": null,
+    "state": "running",
+    "program": "<python with no main file>",
+    "git": {
+        "remote": "https://github.com/Geethen/Burn_Area_Mapping.git",
+        "commit": "2b0d31a124fc864863892c9b8b175d67765fadfe"
+    },
+    "email": "geethen.singh@gmail.com",
+    "root": "C:/Users/coach/myfiles/postdoc/Fire/code/Burn_Area_Mapping",
+    "host": "DESKTOP-SOM8S5C",
+    "username": "coach",
+    "executable": "c:\\ProgramData\\Anaconda3\\envs\\erthy\\python.exe"
+}
