@@ -51,7 +51,7 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
         thermalBands = image.select('ST_B.*').multiply(0.00341802).add(149.0)
 
         # Compute normalised burn ratio (NBR)
-        nbr = image.normalizedDifference(['SR_B5', 'SR_B7']).multiply(-1).rename('nbr')
+        nbr = image.normalizedDifference(['SR_B5', 'SR_B7']).rename('nbr')
 
         #  Replace the original bands with the scaled ones and apply the masks.
         return image.addBands([opticalBands, thermalBands, nbr], None, True)\
@@ -76,7 +76,7 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
         thermalBand = image.select('ST_B6').multiply(0.00341802).add(149.0)
 
         # Compute normalised burn ratio (NBR)
-        nbr = image.normalizedDifference(['SR_B4', 'SR_B7']).multiply(-1).rename('nbr')
+        nbr = image.normalizedDifference(['SR_B5', 'SR_B7']).rename('nbr')
 
         # Replace the original bands with the scaled ones and apply the masks.
         return image.addBands(opticalBands, None, True)\
@@ -103,29 +103,41 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
         cloudMask = image.linkCollection(csPlus, [QA_BAND]).select(QA_BAND).gte(CLEAR_THRESHOLD)
 
         # Compute normalised burn ratio (NBR)
-        nbr = image.normalizedDifference(['B12', 'B8']).rename('nbr')
+        nbr = image.normalizedDifference(['B8A', 'B12']).rename('nbr')
 
         # scale and mask out clouds
         return image.divide(10000).addBands(nbr).updateMask(cloudMask)
-   
+
 # Prepare Sentinel or Landsat
 def preProcessXCollection(image: ee.Image, nImages: int, returnInterval: int)-> ee.ImageCollection:
     """
     This function performs spatio-temporal filtering, cloud masking for Landsat and Sentinel-2.
+
+    Args:
+        image (ee.Image): The image to be processed.
+        nImages (int): The number of prior images to be used for training.
+        returnInterval (int): The return interval for the sensor.
+
+    Returns:
+        ee.ImageCollection: The processed image collection.
     
     """
     # Get satellite name
     sensor = image.get('SPACECRAFT_ID').getInfo()
     if sensor is None:
         sensor = 'Sentinel-2'
-    # Spatiio-temporal filtering
+    # Spatio-temporal filtering
     logging.info("Preparing X image collection (filtering, scaling, cloud masking)")
 
     startDate = image.date().advance(-nImages*returnInterval*3, 'day')
     endDate = image.date()
-    filteredImages = supportedSensors.get(sensor).filterBounds(image.geometry()).filterDate(startDate,endDate)\
-        .filter(ee.Filter.eq('WRS_PATH',image.get('WRS_PATH')))\
-        .filter(ee.Filter.eq('WRS_ROW',image.get('WRS_ROW')))
+    if sensor == 'Sentinel-2':
+        filteredImages = supportedSensors.get(sensor).filterBounds(image.geometry()).filterDate(startDate,endDate)\
+            .filter(ee.Filter.eq('MGRS_TILE',image.get('MGRS_TILE')))
+    else:
+        filteredImages = supportedSensors.get(sensor).filterBounds(image.geometry()).filterDate(startDate,endDate)\
+            .filter(ee.Filter.eq('WRS_PATH',image.get('WRS_PATH')))\
+            .filter(ee.Filter.eq('WRS_ROW',image.get('WRS_ROW')))
     refDate = image.date()
     result = filteredImages.map(lambda image: image.set('dayDist', refDate.difference(image.date(), 'day'))
                                 ).sort('dayDist').limit(nImages).merge([image])\

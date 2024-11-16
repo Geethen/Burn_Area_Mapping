@@ -6,7 +6,7 @@ from tqdm.auto import tqdm
 from logger import logging
 from exception import customException
 from geeml.extract import extractor
-from data_preprocessing import preProcessXCollection
+from components.data_preprocessing import preProcessXCollection
 
 try:
     service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
@@ -48,7 +48,7 @@ def getStats(imageCollection: ee.ImageCollection)->pd.DataFrame:
     row['scenes'] = scenes
     return row
 
-def getImages(image: ee.Image, featureCollection: ee.FeatureCollection)-> ee.ImageCollection:
+def getImages(image: ee.Image, featureCollection: ee.FeatureCollection, returnInterval: int)-> ee.ImageCollection:
     """ 
     1) Checks if image is spatio-temporally within a fire event, labels image accordingly and
     2) Gets all prior images associated with creating a feature.
@@ -71,15 +71,15 @@ def getImages(image: ee.Image, featureCollection: ee.FeatureCollection)-> ee.Ima
     yImage = ee.Algorithms.If(dateRange.contains(image.date()), image.set('label', 1).copyProperties(image), image.set('label', 0).copyProperties(image))
 
     # Define datasets, get xweeks nImages prior to image (i.e., get time series info)
-    xImages =  preProcessXCollection(image = image, nImages = 4, returnInterval = 16)
+    xImages =  preProcessXCollection(image = image, nImages = 4, returnInterval = returnInterval)
     return xImages, yImage
 
-def extractDataset(sensor, country, startDate, endDate, fireEvents, Xweeks: int, filename)-> pd.DataFrame:
+def extractDataset(sensor, country, startDate, endDate, fireEvents, returnInterval: int, filename)-> pd.DataFrame:
     """Extracts the dataset from the given image collection
     
     Args:
         sensor (str): 
-        country (ee.Geometry): 
+        country (str): 
         startDate (ee.date): 
         endDate (ee.Date): 
 
@@ -99,11 +99,12 @@ def extractDataset(sensor, country, startDate, endDate, fireEvents, Xweeks: int,
     for idx in tqdm(range(xSize)):
         xImage = ee.Image(xListImages.get(idx))
         # get Ximages and labelled y image
-        xImages, yImage = getImages(xImage, fireEvents)
+        xImages, yImage = getImages(xImage, fireEvents, returnInterval= returnInterval)
         # convert to geodataframe
         try:
             row = getStats(xImages)
             row['label'] = ee.Image(yImage).get('label').getInfo()
+            print(row)
             outdf = pd.concat([outdf, row])
             # Write the results to a file.
             with open(filename, 'w', newline='') as file:
