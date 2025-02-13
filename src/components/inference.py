@@ -84,13 +84,15 @@ class Inference:
             print("There are no new scenes with fire to proceed.")
         
 
-    def initiate_inference_pipeline(self, sensor, country):
+    def initiate_inference_pipeline(self, sensor: str, country: str, startDate:str = None, endDate:str = None)->list:
         """
         Conducts inference pipeline for fire detection.
 
         Args:
             sensor (str): Type of sensor used for data collection.
             country (str): Country for which the inference is performed.
+            startDate (str): A date str formatted as 'YYYY-MM-DD'. If specified, overrides last checked date
+            endDate (str): A date str formatted as 'YYYY-MM-DD'. If specified, overrides last current date
 
         Returns:
             list: List of scenes with fires.
@@ -99,11 +101,20 @@ class Inference:
         try:
             if self.collectionUpdates(supportedSensors.get(sensor), country= country):
                 # extract covariates and prepare data for inference.
-                # Get current date
-                current_date = datetime.now().date()
-                # Format the current date as "YYYY-MM-DD"
-                current_formattedDate = ee.Date(current_date.strftime("%Y-%m-%d"))
-                last_checked = load_object(self.model_config.dateChecked_path)
+                if endDate is None:
+                    # Get current date
+                    current_date = datetime.now().date()
+                    # Format the current date as "YYYY-MM-DD"
+                    current_formattedDate = ee.Date(current_date.strftime("%Y-%m-%d"))
+                else:
+                    current_date = endDate
+                    # Format the end date as "YYYY-MM-DD"
+                    current_formattedDate = ee.Date(endDate)
+
+                if startDate is None:
+                    last_checked = load_object(self.model_config.dateChecked_path)
+                else:
+                    last_checked = ee.Date(startDate)
                 print("input dates", last_checked, current_date)
                 df = extractInferenceDataset(sensor, country, ee.Date(last_checked), current_formattedDate)
                 last_checked = datetime.now().date()

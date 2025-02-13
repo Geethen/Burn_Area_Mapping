@@ -19,5 +19,5 @@ target_directory = os.path.join(current_directory, relative_path)
 # Change to the target directory
 os.chdir(target_directory)
 inference_pipeline = Inference()
-sceneList = inference_pipeline.initiate_inference_pipeline('LANDSAT_8', 'South Africa')
+sceneList = inference_pipeline.initiate_inference_pipeline('LANDSAT_8', 'South Africa', '2016-01-01', '2017-01-01')
 sceneList
