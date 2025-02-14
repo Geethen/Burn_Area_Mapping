@@ -1,6 +1,6 @@
 import ee
 import os
-from inference import Inference
+from src.components.inference import Inference
 
 service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
 credentials = ee.ServiceAccountCredentials(service_account, 'secret.json')

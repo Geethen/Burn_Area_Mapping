@@ -3,7 +3,7 @@ name: Daily Python Script
 on:
   push:
   schedule:
-    - cron: "0 22 * * *" # Runs the job every day at midnight SAST
+    - cron: "0 22 * * *" # Runs at 22:00 UTC (00:00 SAST)
 
 permissions:
   contents: read
@@ -16,10 +16,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
-        python-version: "3.10"
+        python-version: "3.12"
     - uses: actions/cache@v3
       id: cache
       with:
@@ -29,8 +29,9 @@ jobs:
           ${{ runner.os }}-pip-
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt 
+        python -m pip install --upgrade pip uv
+        uv pip install -r requirements.txt 
+      if: steps.cache.outputs.cache-hit != 'true' # Skip if cache is valid
     - name: Decode secrets file and setup service account key
       run: |
         echo ${{ secrets.EE_SERVICE_ACCOUNT_KEY }} | base64 -d > secret.json

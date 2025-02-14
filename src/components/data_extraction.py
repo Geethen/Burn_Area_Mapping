@@ -3,10 +3,10 @@ import ee
 import sys
 from tqdm.auto import tqdm
 
-from logger import logging
-from exception import customException
+from src.logger import logging
+from src.exception import customException
 from geeml.extract import extractor
-from components.data_preprocessing import preProcessXCollection
+from src.components.data_preprocessing import preProcessXCollection
 
 try:
     service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
