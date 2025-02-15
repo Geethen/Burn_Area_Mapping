@@ -35,5 +35,7 @@ jobs:
     - name: Decode secrets file and setup service account key
       run: |
         echo ${{ secrets.EE_SERVICE_ACCOUNT_KEY }} | base64 -d > secret.json
+    - name: Debug Python Path
+      run: python -c "import sys; print(sys.path)"
     - name: Run Python script
-      run: python src/components/stage1_daily.py
+      run: PYTHONPATH=src python src/components/stage1_daily.py
