@@ -3,9 +3,10 @@ import ee
 import sys
 from tqdm.auto import tqdm
 
+from geeml.extract import extractor
+from typing import Union
 from src.logger import logging
 from src.exception import customException
-from geeml.extract import extractor
 from src.components.data_preprocessing import preProcessXCollection
 
 try:
@@ -122,7 +123,7 @@ def getInferenceImages(image: ee.Image)-> ee.ImageCollection:
     xImages =  preProcessXCollection(image = image, nImages = 4, returnInterval = 16)
     return xImages
         
-def extractInferenceDataset(sensor, country, startDate, endDate)-> pd.DataFrame:
+def extractInferenceDataset(sensor, aoi: Union[str, ee.Geometry], startDate, endDate)-> pd.DataFrame:
     """Extracts the dataset from the given image collection
     
     Args:
@@ -136,9 +137,12 @@ def extractInferenceDataset(sensor, country, startDate, endDate)-> pd.DataFrame:
     
     """
     logging.info("Extracting x inference data (extractInferenceDataset)")
-    countryGeom = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017").filter(ee.Filter.eq('country_na', country)).geometry()
+    if isinstance(aoi, str):
+        aoi = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017").filter(ee.Filter.eq('country_na', aoi)).geometry()
+    else:
+        aoi = aoi
     # filterImages to country of interest
-    filteredImages = supportedSensors.get(sensor).filterBounds(countryGeom).filterDate(startDate, endDate)
+    filteredImages = supportedSensors.get(sensor).filterBounds(aoi).filterDate(startDate, endDate)
     
     xSize = filteredImages.size().getInfo()
     xListImages = filteredImages.toList(xSize)
@@ -195,15 +199,16 @@ def extractXy (yCollection: ee.FeatureCollection, Xweeks: int, filename):
         
 
 def extractFire(collection: ee.ImageCollection, region: ee.Feature, scale:int) -> None:
-    """For each pixel in the fire image collection (burn areas) extract coordinates,
-      date and fire risk. Data is exported to the data folder in the format "fire_{date}.csv".
-      The date corresponds to the first day of the month.
+    """
+    For each pixel in the fire image collection (burn areas) extract coordinates,
+    date and fire risk. Data is exported to the data folder in the format "fire_{date}.csv".
+    The date corresponds to the first day of the month.
     
     Args:
         collection (ee.ImageCollection): Preprocessed imageCollections from the data_preprocessing stage
         region (ee.Feature): The extent of the area to extract data.
         scale (int): The scale at which the dat should be extracted.      
-      """
+    """
     
     coords = ee.Image.pixelCoordinates('EPSG:4326')
     # Risk of fires

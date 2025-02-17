@@ -7,6 +7,7 @@ import mapie
 from datetime import datetime
 from dataclasses import dataclass
 import geedim as gd
+from typing import Union
 
 from src.components.data_extraction import extractInferenceDataset
 from src.utils import save_object, load_object
@@ -40,21 +41,24 @@ class Inference:
     def __init__(self):
         self.model_config = modelInferenceConfig()
 
-    def collectionUpdates(self, imageCollection: ee.ImageCollection, country: str)->bool:
+    def collectionUpdates(self, imageCollection: ee.ImageCollection, aoi: Union[str, ee.Geometry])->bool:
         """
         checks if new scenes have been made available
 
         Args:
             imageCollection (ee.ImageCollection):
-            country (str): Name of the country to check for new scenes
+            country (str, ee.Geometry): Name of the country or Geometry to check for new scenes
 
         Returns:
             Boolean: True if new scenes have been made available, False otherwise.
         
         """
         logging.info("Checking for new scenes")
-        countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
-        self.country = countries.filter(ee.Filter.eq('country_na', country))
+        if isinstance(aoi, str):
+            countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
+            self.aoi = countries.filter(ee.Filter.eq('country_na', aoi))
+        else:
+            self.aoi = aoi
         # Get current date
         current_date = datetime.now().date()
         # Format the current date as "YYYY-MM-DD"
@@ -64,7 +68,7 @@ class Inference:
         except Exception:
             last_checked = "2024-03-01"
             save_object(self.model_config.dateChecked_path, last_checked)
-        nScenes = imageCollection.filterBounds(self.country.geometry()).filterDate(ee.Date(last_checked), current_formattedDate).size().getInfo()
+        nScenes = imageCollection.filterBounds(self.aoi.geometry()).filterDate(ee.Date(last_checked), current_formattedDate).size().getInfo()
         print("Number of new scenes:", nScenes)
         return nScenes>0
 
@@ -84,13 +88,13 @@ class Inference:
             print("There are no new scenes with fire to proceed.")
         
 
-    def initiate_inference_pipeline(self, sensor: str, country: str, startDate:str = None, endDate:str = None)->list:
+    def initiate_inference_pipeline(self, sensor: str, aoi: Union[str, ee.Geometry], startDate:str = None, endDate:str = None)->list:
         """
         Conducts inference pipeline for fire detection.
 
         Args:
             sensor (str): Type of sensor used for data collection.
-            country (str): Country for which the inference is performed.
+            country (str, ee.Geometry): Country for which the inference is performed.
             startDate (str): A date str formatted as 'YYYY-MM-DD'. If specified, overrides last checked date
             endDate (str): A date str formatted as 'YYYY-MM-DD'. If specified, overrides last current date
 
@@ -99,7 +103,7 @@ class Inference:
         """
         logging.info("Entering inference pipeline")
         try:
-            if self.collectionUpdates(supportedSensors.get(sensor), country= country):
+            if self.collectionUpdates(supportedSensors.get(sensor), aoi = aoi):
                 # extract covariates and prepare data for inference.
                 if endDate is None:
                     # Get current date
@@ -116,7 +120,7 @@ class Inference:
                 else:
                     last_checked = ee.Date(startDate)
                 print("input dates", last_checked, current_date)
-                df = extractInferenceDataset(sensor, country, ee.Date(last_checked), current_formattedDate)
+                df = extractInferenceDataset(sensor, aoi, ee.Date(last_checked), current_formattedDate)
                 last_checked = datetime.now().date()
                 # make prediction
                 downloadList = self.getPredictions(df)
