@@ -56,7 +56,7 @@ class Inference:
         logging.info("Checking for new scenes")
         if isinstance(aoi, str):
             countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
-            self.aoi = countries.filter(ee.Filter.eq('country_na', aoi))
+            self.aoi = countries.filter(ee.Filter.eq('country_na', aoi)).geometry()
         else:
             self.aoi = aoi
         # Get current date
@@ -68,7 +68,7 @@ class Inference:
         except Exception:
             last_checked = "2024-03-01"
             save_object(self.model_config.dateChecked_path, last_checked)
-        nScenes = imageCollection.filterBounds(self.aoi.geometry()).filterDate(ee.Date(last_checked), current_formattedDate).size().getInfo()
+        nScenes = imageCollection.filterBounds(self.aoi).filterDate(ee.Date(last_checked), current_formattedDate).size().getInfo()
         print("Number of new scenes:", nScenes)
         return nScenes>0
 
