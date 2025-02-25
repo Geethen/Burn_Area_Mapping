@@ -19,9 +19,9 @@ from mapie.metrics import classification_mean_width_score
 from sklearn.metrics import classification_report, confusion_matrix, matthews_corrcoef, f1_score, accuracy_score
 from dvclive import Live
 
-from utils import save_object, evaluate_models
-from logger import logging
-from exception import customException
+from src.utils import save_object, evaluate_models
+from src.logger import logging
+from src.exception import customException
 
 @dataclass
 class modelTrainerConfig:
