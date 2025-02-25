@@ -1,6 +1,7 @@
 import os
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import seaborn as sns
@@ -9,9 +10,7 @@ import pandas as pd
 
 from scipy.stats import mode
 from catboost import CatBoostClassifier
-from sklearn.ensemble import (AdaBoostClassifier, HistGradientBoostingClassifier, RandomForestClassifier)
-from sklearn.tree import DecisionTreeClassifier
-from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier
 from mapie.classification import MapieClassifier
 from mapie.metrics import classification_coverage_score
 from mapie.metrics import classification_mean_width_score
@@ -25,7 +24,7 @@ from src.exception import customException
 
 @dataclass
 class modelTrainerConfig:
-    trained_model_file_path = os.path.join('artifacts', "model.pkl")
+    trained_model_file_path = os.path.join(Path.cwd().parent,'components/artifacts', "model.pkl")
 
 class modelTrainer:
     def __init__(self):
@@ -49,44 +48,21 @@ class modelTrainer:
             print(f"Naive Baseline Accuracy: {accuracy:.2f}")
 
             models = {
-                #  "Decision Tree": DecisionTreeClassifier(),
-                "Random Forest": RandomForestClassifier(),                
-                # "Gradient Boosting": HistGradientBoostingClassifier(),
-                "CatBoost": CatBoostClassifier(verbose = False),
-                # "XGBRegressor": XGBClassifier(),
-                # "AdaBoost Regressor": AdaBoostClassifier()
+                "Random Forest": RandomForestClassifier(),
+                "CatBoost": CatBoostClassifier(verbose = False)
             }
 
             params={
-                # "Decision Tree": {
-                #     'criterion':['log_loss', 'gini', 'entropy'],
-                #     # 'splitter':['best','random'],
-                #     # 'max_features':['sqrt','log2'],
-                # },
                 "Random Forest":{
                     # 'criterion':['log_loss', 'gini', 'entropy'],
-                 
                     # 'max_features':['sqrt','log2',None],
                     'n_estimators': [8,16,32,64,128,256]
                 },
-                # "Gradient Boosting":{
-                #     # 'loss':['squared_error', 'huber', 'absolute_error', 'quantile'],
-                #     'learning_rate':[.1,.01,.05,.001],
-                #     'subsample':[0.6,0.7,0.75,0.8,0.85,0.9],
-                #     # 'criterion':['squared_error', 'friedman_mse'],
-                #     # 'max_features':['auto','sqrt','log2'],
-                #     'n_estimators': [8,16,32,64,128,256]
-                # },
                 "CatBoost":{
                     'depth': [6,8,10],
                     'learning_rate': [0.01, 0.05, 0.1],
                     'iterations': [30, 50, 100]
-                },
-                # "AdaBoost":{
-                #     'learning_rate':[.1,.01,0.5,.001],
-                #     # 'loss':['linear','square','exponential'],
-                #     'n_estimators': [8,16,32,64,128,256]
-                # }
+                }
             }
 
             model_report: dict = evaluate_models(X_train, y_train, X_test, y_test, models, param=params)
@@ -117,13 +93,6 @@ class modelTrainer:
 
             # dvc register model for tracking, and log metrics and confusion metric
             with Live() as live:
-                # live.log_artifact(
-                #     self.model_trainer_config.trained_model_file_path,
-                #     type="model",
-                #     name="BurnArea-classification",
-                #     desc="This is a Scene-level classification model to discern satellite images with burn areas.",
-                #     labels=["scene-level", "classification", "satellite-images"],
-                # )
                 live.log_metric("test/f1", f1_score(y_test, predicted, average="weighted"), plot=False)
                 live.log_metric("test/mcc", matthews_corrcoef(y_test, predicted), plot=False)
                 live.log_sklearn_plot("confusion_matrix", y_test, predicted, name="test/confusion_matrix", title="Test Confusion Matrix")

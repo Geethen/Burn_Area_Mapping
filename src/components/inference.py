@@ -8,6 +8,7 @@ from datetime import datetime
 from dataclasses import dataclass
 import geedim as gd
 from typing import Union
+from pathlib import Path
 
 from src.components.data_extraction import extractInferenceDataset
 from src.utils import save_object, load_object
@@ -33,9 +34,10 @@ supportedSensors = {'Sentinel-2': ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZE
 
 @dataclass
 class modelInferenceConfig:
-    model_path = os.path.join('artifacts',"model.pkl")
-    dateChecked_path = os.path.join('artifacts',"lastCheckedDate.pkl")
-    downloadList_path = os.path.join('artifacts',"downloadList.pkl")
+    rootdir = Path.cwd().parent
+    model_path = os.path.join(rootdir, 'components/artifacts',"model.pkl")
+    dateChecked_path = os.path.join(rootdir,'components/artifacts',"lastCheckedDate.pkl")
+    downloadList_path = os.path.join(rootdir,'components/artifacts',"downloadList.pkl")
 
 class Inference:
     def __init__(self):

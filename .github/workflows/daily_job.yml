@@ -2,8 +2,8 @@ name: Daily Python Script
 
 on:
   push:
-  schedule:
-    - cron: "0 22 * * *" # Runs at 22:00 UTC (00:00 SAST)
+  # schedule:
+    # - cron: "0 22 * * *" # Runs at 22:00 UTC (00:00 SAST)
 
 permissions:
   contents: read

@@ -1,9 +1,17 @@
 import sys
 import os
 import ee
+import pandas as pd
+import numpy as np
+from dataclasses import dataclass
+from pathlib import Path
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from src.exception import customException
-from src.utils import save_object
+from src.logger import logging
 
 try:
     service_account = 'bam-981@ee-geethensingh.iam.gserviceaccount.com'
@@ -14,19 +22,9 @@ except Exception as e:
     ee.Initialize()
     customException = customException(e, sys)
 
-from src.logger import logging
-import pandas as pd
-import numpy as np
-from dataclasses import dataclass
-
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
 @dataclass
 class dataTransformationConfig:
-    preprocessor_obj_file_path = os.path.join('artifacts','preprocessor.pkl')
+    preprocessor_obj_file_path = os.path.join(Path.cwd().parent,'components/artifacts','preprocessor.pkl')
 
 class dataTransformation:
     def __init__(self):

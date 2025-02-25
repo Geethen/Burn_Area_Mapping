@@ -52,9 +52,10 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
 
         # Compute normalised burn ratio (NBR)
         nbr = image.normalizedDifference(['SR_B5', 'SR_B7']).rename('nbr')
+        ndvi = image.normalizedDifference(['SR_B5', 'SR_B4']).rename('ndvi')
 
         #  Replace the original bands with the scaled ones and apply the masks.
-        return image.addBands([opticalBands, thermalBands, nbr], None, True)\
+        return image.addBands([opticalBands, thermalBands, nbr, ndvi], None, True)\
             .updateMask(clouds)\
             .updateMask(cirrus)\
             .updateMask(saturationMask)
@@ -77,6 +78,7 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
 
         # Compute normalised burn ratio (NBR)
         nbr = image.normalizedDifference(['SR_B5', 'SR_B7']).rename('nbr')
+        ndvi = image.normalizedDifference(['SR_B5', 'SR_B4']).rename('ndvi')
 
         # Replace the original bands with the scaled ones and apply the masks.
         return image.addBands(opticalBands, None, True)\
@@ -104,9 +106,10 @@ def cloudMask(sensor: str, image : ee.Image)-> ee.Image:
 
         # Compute normalised burn ratio (NBR)
         nbr = image.normalizedDifference(['B8A', 'B12']).rename('nbr')
+        ndvi = image.normalizedDifference(['B8A', 'B4']).rename('ndvi')
 
         # scale and mask out clouds
-        return image.divide(10000).addBands(nbr).updateMask(cloudMask)
+        return image.divide(10000).addBands([nbr, ndvi]).updateMask(cloudMask)
 
 # Prepare Sentinel or Landsat
 def preProcessXCollection(image: ee.Image, nImages: int, returnInterval: int)-> ee.ImageCollection:

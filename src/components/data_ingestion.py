@@ -1,18 +1,19 @@
 import sys
 import os
+from dataclasses import dataclass
+from pathlib import Path
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
 from src.exception import customException
 from src.logger import logging
-import pandas as pd
-
-from sklearn.model_selection import train_test_split
-from dataclasses import dataclass
 
 @dataclass
 class dataIngestionConfig:
-    train_data_path = os.path.join('artifacts',"train.csv")
-    test_data_path = os.path.join('artifacts',"test.csv")
-    calibration_data_path = os.path.join('artifacts',"calibration.csv")
-    raw_data_path = os.path.join('artifacts',"raw.csv")
+    train_data_path = os.path.join(Path.cwd().parent,'components/artifacts',"train.csv")
+    test_data_path = os.path.join(Path.cwd().parent,'components/artifacts',"test.csv")
+    calibration_data_path = os.path.join(Path.cwd().parent,'components/artifacts',"calibration.csv")
+    raw_data_path = os.path.join(Path.cwd().parent,'components/artifacts',"raw.csv")
 
 class dataIngestion:
     def __init__(self):
@@ -23,7 +24,7 @@ class dataIngestion:
 
         try:
             # Get a list of all CSV files in the directory
-            csv_files = [file for file in os.listdir(os.getcwd()) if file.startswith('extract_') and file.endswith('.csv')]
+            csv_files = [file for file in os.listdir(os.getcwd().parent) if file.startswith('extract_') and file.endswith('.csv')]
 
             # Initialize an empty DataFrame to store the merged data
             df = pd.DataFrame()

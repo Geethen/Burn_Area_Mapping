@@ -16,7 +16,6 @@ try:
 except Exception as e:
     ee.Authenticate()
     ee.Initialize()
-    customException = customException(e, sys)
 
 supportedSensors = {'Sentinel-2': ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED"),
                     'LANDSAT_4': ee.ImageCollection("LANDSAT/LT04/C02/T1_L2"),
@@ -36,13 +35,19 @@ def getStats(imageCollection: ee.ImageCollection)->pd.DataFrame:
         pd.DataFrame containing the 5 percentiles and a column ('scenes') containing a list of scene id's used for the computation
     """
     scenes = [imageCollection.aggregate_array('system:index').getInfo()]
+    # greenest nbr
+    greenest = imageCollection.qualityMosaic('ndvi').select('nbr')
+    # max dnbr
+    maxDnbr = imageCollection.map(lambda image: image.addBands(greenest.subtract(image.select('nbr')).rename('dnbr'))).qualityMosaic('dnbr')
+    # create mask
+    mask = maxDnbr.select('dnbr').gte(0.1)
     # Compute NBR temporal percentiles
     reducer = ee.Reducer.percentile([5, 25, 50, 75, 95])
     percentiles = imageCollection.select('nbr').reduce(reducer)
     # Compute temporal variance
     variance = percentiles.reduce(ee.Reducer.variance()).rename('temporal_variance')
     # Compute image spatial stats
-    stats = variance.reduceRegion(reducer = reducer,
+    stats = variance.updateMask(mask).reduceRegion(reducer = reducer,
                                             geometry = imageCollection.geometry(),
                                             scale = 1000)
     row = pd.DataFrame([stats.getInfo()])
