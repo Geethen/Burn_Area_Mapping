@@ -4,3 +4,9 @@ extract*.csv
 *.log
 # ignore tif files
 *.tif
+.codegpt
+# ignore geojson and gif
+*.geojson
+*.gif
+# ignore wandb files
+wandb/
