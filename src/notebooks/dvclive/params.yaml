@@ -1,4 +1,0 @@
-learning_rate: 0.0025
-epochs: 100
-metric_index: 1
-save_model_path: C:\Users\coach\myfiles\postdoc\Fire\models\Unet_convnextB_27092024.pth
